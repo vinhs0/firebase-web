@@ -1,4 +1,4 @@
-﻿rules_version = '2';
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function isSignedIn() {
@@ -8,7 +8,7 @@ service cloud.firestore {
     function isAdmin() {
       return isSignedIn()
         && request.auth.token.email != null
-        && request.auth.token.email in ['researcher@example.com'];
+        && request.auth.token.email in ['__ALLOWED_ADMIN_EMAIL__'];
     }
 
     match /participants/{participantId} {
@@ -34,5 +34,4 @@ service cloud.firestore {
     }
   }
 }
-
 

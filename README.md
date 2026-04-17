@@ -15,9 +15,12 @@ Firebase Hosting app for a scripted online experiment with:
 - `public/index.html`: participant-facing experiment
 - `public/admin.html`: researcher export dashboard
 - `public/experiment-content.js`: consent copy, factors, questions, scripted AI responses
-- `public/firebase-config.js`: Firebase web config and runtime toggles
+- `.env`: single source of app config for local/dev use
+- `scripts/sync-env.ps1`: generates browser-safe config and Firestore rules from `.env`
+- `public/firebase-config.js`: reads generated browser config
 - `public/firebase-runtime.js`: Firebase Auth + Firestore helpers
 - `firestore.rules`: participant write rules and admin read scaffold
+- `firestore.rules.template`: Firestore rules template with env-driven admin email
 
 ## How to configure
 
@@ -27,10 +30,14 @@ Firebase Hosting app for a scripted online experiment with:
 4. Enable Authentication with:
    - Anonymous
    - Email/Password
-5. Replace the placeholder config in `public/firebase-config.js`.
-6. Set `enableFirebaseSync: true` after the config values are real.
-7. Replace the placeholder admin email in `firestore.rules`.
-8. Create a researcher account in Firebase Auth that matches that admin email.
+5. Fill in `.env` with your Firebase web app values and researcher email.
+6. Run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\sync-env.ps1
+```
+
+7. Create a researcher account in Firebase Auth that matches `ALLOWED_ADMIN_EMAIL`.
 
 ## Content you will likely customize
 
@@ -90,7 +97,11 @@ If an explicit case exists, the app uses it. Otherwise it falls back to the dete
 
 ### Survey embed
 
-Update `survey.embedUrl` or `survey.fallbackUrl` in `public/firebase-config.js`.
+Update `SURVEY_EMBED_URL` or `SURVEY_FALLBACK_URL` in `.env`, then rerun:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\sync-env.ps1
+```
 
 ## Data captured
 
@@ -125,6 +136,12 @@ The admin page lets a researcher:
 - download full JSON bundle
 
 ## Deploy
+
+Before serving or deploying, regenerate the browser config and Firestore rules:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\sync-env.ps1
+```
 
 ```bash
 firebase login
