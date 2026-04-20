@@ -162,31 +162,29 @@ export const experimentContent = {
     summary:
       'Website này được thiết kế cho thí nghiệm online. Người tham gia sẽ làm một bài trắc nghiệm ngắn, sau đó có thể bấm “Check đáp án với AI” để xem phản hồi cố định đã được soạn sẵn.',
     bullets: [
-      'Dữ liệu chỉ phục vụ nghiên cứu học thuật.',
+      'Data is collected for scientific purposes.',
       'Bạn có thể dừng tham gia bất kỳ lúc nào bằng cách đóng trang.',
-      'Hệ thống “AI” trong nghiên cứu này không phải chatbot thật; mọi phản hồi đều được cố định trước.',
-      'Thời gian hoàn thành dự kiến: 5–8 phút.',
+      'Survey length: 5-8 minutes.',
     ],
-    contact: [
+    contact: [ //Change this with your research team information.
       'Nhóm nghiên cứu: Research Team',
       'Liên hệ: researcher@example.com',
       'Đơn vị: Interactive Media Lab',
     ],
     consentLabel:
-      'Tôi đã đọc thông tin nghiên cứu và đồng ý tham gia thí nghiệm này.',
+      'I have read, and I agree to participate in this survey.',
     declineCopy:
       'Bạn đã chọn không tham gia. Không có dữ liệu nào được gửi đi trong phiên này.',
   },
   quiz: {
     helper:
-      'Chọn một đáp án cho mỗi câu hỏi. Sau khi chọn, bạn có thể xem phản hồi AI mô phỏng hoặc tiếp tục sang câu tiếp theo.',
+      'Choose only one answer for each question. Afterwards, please press "Show AI response" to check your answer.',
     aiPanelTitle: 'Phase 2: AI mô phỏng',
     aiPanelCopy:
       'Khung này chỉ hiển thị phản hồi đã được soạn sẵn theo từng trường hợp. Không có nhập liệu tự do.',
-    checkButton: 'Check đáp án với AI',
-    skipButton: 'Tiếp tục không check AI',
-    nextButton: 'Câu tiếp theo',
-    finalButton: 'Đi đến survey cuối',
+    checkButton: 'Show AI response',
+    nextButton: 'Next question',
+    finalButton: 'Final survey',
   },
   survey: {
     title: 'Survey cuối',

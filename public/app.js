@@ -382,11 +382,6 @@ function handleClick(event) {
     return;
   }
 
-  if (action === 'skip-ai') {
-    finalizeCurrentQuestion(true);
-    return;
-  }
-
   if (action === 'advance-question') {
     finalizeCurrentQuestion(false);
     return;
@@ -717,16 +712,7 @@ function renderQuestion() {
                   }
                 </button>
               `
-              : `
-                <button
-                  class="button ghost"
-                  data-action="skip-ai"
-                  type="button"
-                  ${answerState.selectedOptionId ? '' : 'disabled'}
-                >
-                  ${experimentContent.quiz.skipButton}
-                </button>
-              `
+              : ''
           }
         </div>
       </article>
