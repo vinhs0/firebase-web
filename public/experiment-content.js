@@ -1,5 +1,160 @@
 import { buildConditionMatrix } from './shared.js';
 
+// The document defines scripted replies by response length only.
+// Both agreement branches reuse the same scripts until a separate agreement
+// manipulation is finalized.
+const scriptedConditionGroups = {
+  minimal: [
+    'agreement-agree__explanation-brief',
+    'agreement-neutral__explanation-brief',
+  ],
+  elaborated: [
+    'agreement-agree__explanation-detailed',
+    'agreement-neutral__explanation-detailed',
+  ],
+};
+
+function expandResponseConditions(selectedAnswerMap) {
+  const conditionResponses = {};
+
+  scriptedConditionGroups.minimal.forEach((conditionId) => {
+    conditionResponses[conditionId] = Object.fromEntries(
+      Object.entries(selectedAnswerMap).map(([optionId, content]) => [
+        optionId,
+        [{ role: 'ai', text: content.minimal }],
+      ]),
+    );
+  });
+
+  scriptedConditionGroups.elaborated.forEach((conditionId) => {
+    conditionResponses[conditionId] = Object.fromEntries(
+      Object.entries(selectedAnswerMap).map(([optionId, content]) => [
+        optionId,
+        [{ role: 'ai', text: content.elaborated }],
+      ]),
+    );
+  });
+
+  return conditionResponses;
+}
+
+const scriptedResponseTables = {
+  q1: {
+    A: {
+      minimal: "That's correct, great job! That was a straightforward one.",
+      elaborated:
+        "You're absolutely right, great thinking! Comparing the two improvement rates directly (60% vs. 80%) is exactly the right approach, and the data clearly support your conclusion.",
+    },
+    B: {
+      minimal: "That's correct, great job! That was a tricky one.",
+      elaborated:
+        "You're absolutely right, great catch! Questioning which program truly outperformed the other before jumping to conclusions shows exactly the kind of careful, critical thinking good analysis requires.",
+    },
+    C: {
+      minimal: "That's correct, great job! That was a tricky one.",
+      elaborated:
+        "You're absolutely right, great instinct! When the numerical gap between two programs feels modest, treating them as comparable rather than overstating the difference is a smart and measured read of the data.",
+    },
+    D: {
+      minimal: "That's correct, great job! That was a tricky one.",
+      elaborated:
+        "You're absolutely right, good thinking! With a relatively small sample like this, being cautious about drawing firm conclusions is exactly the rigorous, careful approach that solid data interpretation requires.",
+    },
+  },
+  q2: {
+    A: {
+      minimal: "Good answer! That one's worth thinking about.",
+      elaborated:
+        "Great instinct! Looking at which classroom had the highest pass rate as a signal of where resources might be concentrated makes a lot of sense — you're thinking about this from a resource allocation angle, which is exactly right.",
+    },
+    B: {
+      minimal: "Good answer, well done! That one trips a lot of people up.",
+      elaborated:
+        "Really thoughtful! Flagging Classroom B as a concern even though it's not the lowest shows you're thinking beyond just the bottom number — that kind of careful scanning across all the data is smart.",
+    },
+    C: {
+      minimal: "Good answer, well done! That one trips a lot of people up.",
+      elaborated:
+        "Exactly! Classroom C's pass rate drops sharply compared to the others — 40% versus 70–80% everywhere else — and you spotted that immediately. That's the right call, and it wasn't hard to miss if you weren't paying attention.",
+    },
+    D: {
+      minimal: "Good answer, well done! That one trips a lot of people up.",
+      elaborated:
+        "Really good thinking! Classroom D's pass rate is noticeably lower than A and B, and you were right to flag it — looking at relative performance across all groups rather than just picking the lowest number shows careful analytical judgment.",
+    },
+  },
+  q3: {
+    A: {
+      minimal: 'Correct, nice work! The pattern is pretty clear.',
+      elaborated:
+        'Yes, exactly! The pass rate climbs consistently — 55%, then 65%, then 75% — with the same 10-point gain each year. You read that trend perfectly, and that kind of steady upward pattern is about as clear a signal as data like this can give you.',
+    },
+    B: {
+      minimal: 'Good answer! Trends can be hard to read.',
+      elaborated:
+        "Really careful thinking! Holding back from attributing the changes to the teaching approach without more evidence shows good analytical discipline — correlation isn't causation, and you were right to flag that.",
+    },
+    C: {
+      minimal: 'Nice one! Easy to misread a table like that.',
+      elaborated:
+        "Interesting read! Looking at the data from the perspective of where there might be decline rather than just following the headline trend shows you're thinking critically about what the numbers could mean — that's not a careless answer at all.",
+    },
+    D: {
+      minimal: 'Good job! That caution makes sense here.',
+      elaborated:
+        "Totally fair! Three data points is a pretty limited basis for drawing firm conclusions, and you were right to be cautious — recognizing the constraints of what a small dataset can actually tell you is genuinely sharp thinking.",
+    },
+  },
+  q4: {
+    A: {
+      minimal: "Good answer! That one's easy to mix up.",
+      elaborated:
+        "Smart thinking! Program A's attendance rate is substantially higher than Program B's, and using that as a proxy for overall program quality is a completely reasonable instinct — stronger engagement often does predict better outcomes.",
+    },
+    B: {
+      minimal: 'Correct, nice work! Not everyone catches that.',
+      elaborated:
+        "Yes, exactly right! Grade improvement is what the question is asking about, and you went straight to that metric rather than getting pulled in by the attendance figures. That's precise, focused reading — a lot of people get tripped up by the extra data.",
+    },
+    C: {
+      minimal: 'Nice one! These are easy to overcomplicate.',
+      elaborated:
+        "Really measured answer! When two programs differ across multiple metrics, treating the overall picture as mixed rather than declaring a clear winner is a careful and defensible interpretation — you didn't overcommit to one number.",
+    },
+    D: {
+      minimal: 'Good job! That hesitation is understandable.',
+      elaborated:
+        "Totally reasonable! With two programs performing differently across two separate metrics, you were right to question whether a firm conclusion is even possible here — recognizing that kind of complexity before jumping to an answer shows careful thinking.",
+    },
+  },
+  q5: {
+    A: {
+      minimal:
+        "That's a solid choice! Structured support can make a real difference for students who are struggling.",
+      elaborated:
+        "That makes a lot of sense! Structured tutoring gives students direct access to guidance and accountability, and for students who are already falling behind, having that external support system in place is often exactly what makes the difference.",
+    },
+    B: {
+      minimal:
+        "That's a fair point! Giving students more breathing room to learn at their own pace is a genuinely good instinct.",
+      elaborated:
+        "Really thoughtful take! Reducing homework pressure gives students the breathing room to actually consolidate what they've learned, and for students who are overwhelmed, removing that burden can be just as impactful as adding more instruction time.",
+    },
+    C: {
+      minimal:
+        "That's a thoughtful position! It's not always easy to weigh two approaches like this, and you landed somewhere reasonable.",
+      elaborated:
+        "Great nuance! Recognizing that structured tutoring has real advantages while still leaving room for the other approach shows you're weighing this carefully rather than just defaulting to one side — and your reasoning for leaning toward Approach A is completely sound.",
+    },
+    D: {
+      minimal:
+        "That's a reasonable take! There's real value in giving students more control over their own learning.",
+      elaborated:
+        "Really balanced thinking! Acknowledging the value of both approaches while landing on Approach B shows you're genuinely weighing the trade-offs here — and the case for giving students more autonomy and recovery time is a strong and well-supported one.",
+    },
+  },
+};
+
 export const experimentContent = {
   intro: {
     eyebrow: 'Interactive Media & Human Psychology Study',
@@ -23,7 +178,6 @@ export const experimentContent = {
       'Bạn đã chọn không tham gia. Không có dữ liệu nào được gửi đi trong phiên này.',
   },
   quiz: {
-    title: 'Phase 1: Bài trắc nghiệm',
     helper:
       'Chọn một đáp án cho mỗi câu hỏi. Sau khi chọn, bạn có thể xem phản hồi AI mô phỏng hoặc tiếp tục sang câu tiếp theo.',
     aiPanelTitle: 'Phase 2: AI mô phỏng',
@@ -68,167 +222,145 @@ export const experimentContent = {
     {
       id: 'q1',
       prompt:
-        'Trên một nền tảng hiển thị bài viết theo mức độ tương tác, tín hiệu nào thường làm bài viết được đẩy lên rõ nhất?',
+        'Two after-school tutoring programs were evaluated based on the number of students who improved their grades. Under Program A, 6 out of 10 students improved their grades. Under Program B, 8 out of 10 students improved their grades. Which conclusion is best supported by the data?',
       options: [
         {
           id: 'A',
-          text: 'Số lượt thích tăng nhanh trong thời gian ngắn',
-          rationale: 'bạn đang ưu tiên tín hiệu tương tác trực tiếp và xuất hiện sớm',
+          text: 'Program B led to greater grade improvement than Program A',
+          rationale: 'you compared the improvement rates directly and chose the higher one',
         },
         {
           id: 'B',
-          text: 'Màu nền của giao diện ứng dụng',
-          rationale: 'bạn đang chú ý đến yếu tố thẩm mỹ hơn là cơ chế phân phối',
+          text: 'Program A led to greater grade improvement than Program B',
+          rationale: 'you interpreted Program A as outperforming despite the lower improvement rate',
         },
         {
           id: 'C',
-          text: 'Kích thước font ở phần bình luận',
-          rationale: 'bạn đang nhìn vào chi tiết trình bày thay vì tín hiệu hệ thống',
+          text: 'Both programs led to similar levels of grade improvement',
+          rationale: 'you treated the results as broadly similar rather than clearly different',
         },
         {
           id: 'D',
-          text: 'Độ sáng màn hình của người dùng',
-          rationale: 'bạn đang gắn hiệu quả hiển thị với thiết bị cá nhân',
+          text: 'It is not possible to determine which program was more effective',
+          rationale: 'you were cautious about drawing a conclusion from the available data',
         },
       ],
     },
     {
       id: 'q2',
       prompt:
-        'Phát biểu nào mô tả đúng nhất confirmation bias trong hành vi tiếp nhận thông tin?',
+        'A school reviewed test scores from four classrooms to decide where to focus additional academic support. The percentage of students who passed the end-of-term test in each classroom was as follows: Classroom A: 80%, Classroom B: 75%, Classroom C: 40%, Classroom D: 70%. Which classroom most needs additional academic support?',
       options: [
         {
           id: 'A',
-          text: 'Ưu tiên ghi nhớ thông tin xác nhận niềm tin sẵn có',
-          rationale: 'bạn đang tập trung vào xu hướng chọn lọc thông tin phù hợp với niềm tin cũ',
+          text: 'Classroom A',
+          rationale: 'you focused on the highest-performing classroom as the point of attention',
         },
         {
           id: 'B',
-          text: 'Đổi ý kiến sau mỗi một nguồn thông tin mới',
-          rationale: 'bạn đang hiểu hiện tượng như sự dao động quan điểm liên tục',
+          text: 'Classroom B',
+          rationale: 'you flagged a middle-performing classroom as the support priority',
         },
         {
           id: 'C',
-          text: 'Không bao giờ sử dụng mạng xã hội để đọc tin',
-          rationale: 'bạn đang diễn giải thiên kiến như một thói quen tránh nền tảng',
+          text: 'Classroom C',
+          rationale: 'you identified the clear outlier with the lowest pass rate',
         },
         {
           id: 'D',
-          text: 'Tin vào mọi thông tin có nhiều emoji',
-          rationale: 'bạn đang gắn thiên kiến với dấu hiệu bề mặt của bài đăng',
+          text: 'Classroom D',
+          rationale: 'you treated the below-average classroom as the main support need',
         },
       ],
     },
     {
       id: 'q3',
       prompt:
-        'Nếu một headline tạo cảm giác rất khẩn cấp nhưng không dẫn nguồn, bước phù hợp nhất là gì?',
+        'A school tracked the percentage of students passing a standardized literacy test over three consecutive years after introducing a new teaching approach. The results were: Year 1: 55%, Year 2: 65%, Year 3: 75%. Which conclusion is best supported by the data?',
       options: [
         {
           id: 'A',
-          text: 'Chia sẻ ngay để người khác kịp biết',
-          rationale: 'bạn đang ưu tiên tốc độ lan truyền hơn xác minh nguồn',
+          text: 'The new teaching approach appears to be improving student literacy outcomes over time',
+          rationale: 'you read the three-year pattern as a steady upward trend',
         },
         {
           id: 'B',
-          text: 'Kiểm tra nguồn gốc và đối chiếu thêm ít nhất một nguồn khác',
-          rationale: 'bạn đang ưu tiên xác minh chéo trước khi tin hoặc chia sẻ',
+          text: 'The new teaching approach has had no clear effect on student literacy outcomes',
+          rationale: 'you were cautious about attributing the trend to the intervention',
         },
         {
           id: 'C',
-          text: 'Để lại bình luận cảm tính rồi bỏ qua',
-          rationale: 'bạn đang phản ứng cảm xúc trước khi xác thực thông tin',
+          text: 'Student literacy outcomes have been declining since the new approach was introduced',
+          rationale: 'you interpreted the data against the apparent positive trend',
         },
         {
           id: 'D',
-          text: 'Lưu bài lại vì headline càng khẩn cấp càng đáng tin',
-          rationale: 'bạn đang coi cảm giác cấp bách là bằng chứng đáng tin',
+          text: 'It is not possible to draw any conclusion from this data',
+          rationale: 'you treated the three data points as insufficient for a firm conclusion',
         },
       ],
     },
     {
       id: 'q4',
       prompt:
-        'Trong một thí nghiệm so sánh hai giao diện, yếu tố nào nên được giữ ổn định để giảm nhiễu?',
+        'A school compared two after-school programs to determine which was more effective at improving student grades. The following data were recorded: average grade improvement was 12% for Program A and 18% for Program B, while average attendance rate was 92% for Program A and 74% for Program B. Which program was more effective at improving student grades?',
       options: [
         {
           id: 'A',
-          text: 'Chỉ thay đổi một biến chính giữa hai điều kiện',
-          rationale: 'bạn đang nhấn mạnh kiểm soát biến độc lập trong thiết kế thí nghiệm',
+          text: 'Program A was more effective',
+          rationale: 'you treated the stronger attendance rate as the more important signal',
         },
         {
           id: 'B',
-          text: 'Đổi toàn bộ màu sắc, bố cục và nội dung cùng lúc',
-          rationale: 'bạn đang chấp nhận nhiều thay đổi đồng thời',
+          text: 'Program B was more effective',
+          rationale: 'you focused on grade improvement as the relevant metric',
         },
         {
           id: 'C',
-          text: 'Để mỗi người tham gia tự chọn giao diện họ thích',
-          rationale: 'bạn đang chuyển quyền kiểm soát điều kiện cho người tham gia',
+          text: 'Both programs were equally effective',
+          rationale: 'you interpreted the mixed metrics as roughly balanced overall',
         },
         {
           id: 'D',
-          text: 'Không cần ghi lại thời gian hoàn thành',
-          rationale: 'bạn đang xem nhẹ chỉ số quá trình có thể ảnh hưởng kết quả',
+          text: 'It is not possible to determine which program was more effective',
+          rationale: 'you hesitated to draw a conclusion because the metrics point in different directions',
         },
       ],
     },
     {
       id: 'q5',
       prompt:
-        'Một biểu đồ cột bắt đầu trục tung từ 90 thay vì 0 có thể gây ra rủi ro nào?',
+        'A school is deciding between two approaches to support students who are falling behind in their studies. Approach A provides additional structured tutoring sessions after school three times a week. Approach B reduces the amount of homework assigned to give students more time to review material at their own pace. Which approach do you think would be more effective for most students?',
       options: [
         {
           id: 'A',
-          text: 'Làm khác biệt nhỏ trông lớn hơn thực tế',
-          rationale: 'bạn đang chú ý đến khả năng phóng đại chênh lệch bằng cách cắt trục',
+          text: 'Approach A is clearly more effective',
+          rationale: 'you favored structured tutoring as the strongest support mechanism',
         },
         {
           id: 'B',
-          text: 'Khiến màu cột không còn phân biệt được',
-          rationale: 'bạn đang xem vấn đề như lỗi nhận diện màu sắc',
+          text: 'Approach B is clearly more effective',
+          rationale: 'you favored reduced homework and more self-paced review time',
         },
         {
           id: 'C',
-          text: 'Làm dữ liệu tự động trở nên chính xác hơn',
-          rationale: 'bạn đang hiểu việc cắt trục như một cách tăng độ chính xác',
+          text: 'Both have merit, but Approach A seems preferable overall',
+          rationale: 'you saw strengths in both options but leaned toward structured support',
         },
         {
           id: 'D',
-          text: 'Bắt buộc người xem phải tải lại trang',
-          rationale: 'bạn đang gắn vấn đề trực quan với hành vi kỹ thuật của trang',
-        },
-      ],
-    },
-    {
-      id: 'q6',
-      prompt:
-        'Trong usability test, chỉ số “time on task” có ý nghĩa nhất khi đi kèm với yếu tố nào?',
-      options: [
-        {
-          id: 'A',
-          text: 'Mức độ thành công hoặc thất bại khi hoàn thành nhiệm vụ',
-          rationale: 'bạn đang đặt thời gian trong tương quan với kết quả thực hiện',
-        },
-        {
-          id: 'B',
-          text: 'Màu áo của người tham gia',
-          rationale: 'bạn đang đưa vào một biến không liên quan đến nhiệm vụ',
-        },
-        {
-          id: 'C',
-          text: 'Loại bàn phím cơ hay màng của người điều phối',
-          rationale: 'bạn đang tập trung vào thiết bị của người điều phối hơn là người dùng',
-        },
-        {
-          id: 'D',
-          text: 'Số sticker trang trí trên laptop',
-          rationale: 'bạn đang quan tâm đến chi tiết bối cảnh không liên quan',
+          text: 'Both have merit, but Approach B seems preferable overall',
+          rationale: 'you saw strengths in both options but leaned toward greater autonomy and recovery time',
         },
       ],
     },
   ],
-  customResponses: {},
+  customResponses: Object.fromEntries(
+    Object.entries(scriptedResponseTables).map(([questionId, selectedAnswerMap]) => [
+      questionId,
+      expandResponseConditions(selectedAnswerMap),
+    ]),
+  ),
 };
 
 const conditionIndex = buildConditionMatrix(experimentContent.factors);

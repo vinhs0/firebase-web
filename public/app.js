@@ -36,6 +36,32 @@ window.addEventListener('online', () => {
 
 boot();
 
+function renderStageAndFocus(smooth = true) {
+  render();
+
+  const selectorByStage = {
+    consent: '.hero-grid',
+    question: '.question-card',
+    survey: '.survey-card',
+    complete: '.complete-card',
+  };
+
+  const selector = selectorByStage[state.currentStage] ?? '.progress-card';
+
+  requestAnimationFrame(() => {
+    const element = document.querySelector(selector) ?? document.querySelector('.progress-card');
+
+    if (!element) {
+      return;
+    }
+
+    element.scrollIntoView({
+      behavior: smooth ? 'smooth' : 'auto',
+      block: 'start',
+    });
+  });
+}
+
 async function boot() {
   if (state.sessionInitialized && isFirebaseEnabled()) {
     try {
@@ -64,7 +90,7 @@ async function boot() {
     persistState();
   }
 
-  render();
+  renderStageAndFocus(false);
   void syncParticipantState();
 }
 
@@ -187,7 +213,7 @@ function initializeParticipantSession() {
   recordEvent('consent_granted');
   ensureQuestionViewLogged();
   persistState();
-  render();
+  renderStageAndFocus();
   void syncParticipantState();
 }
 
@@ -329,7 +355,7 @@ function handleClick(event) {
 
     if (!checkbox?.checked) {
       if (helper) {
-        helper.textContent = 'Bạn cần tick ô đồng ý trước khi bắt đầu.';
+        helper.textContent = 'Please check the box before starting the survey.';
       }
       return;
     }
@@ -342,7 +368,7 @@ function handleClick(event) {
     state = createBlankState();
     state.declined = true;
     localStorage.removeItem(runtimeConfig.localStorageKey);
-    render();
+    renderStageAndFocus();
     return;
   }
 
@@ -385,7 +411,7 @@ function handleClick(event) {
     recordEvent('survey_acknowledged');
     recordEvent('experiment_completed');
     persistState();
-    render();
+    renderStageAndFocus();
     void syncParticipantState();
   }
 }
@@ -417,7 +443,7 @@ function selectOption(optionId) {
 
   recordEvent('answer_selected', { questionId: question.id, optionId });
   persistState();
-  render();
+  renderStageAndFocus(false);
   void syncParticipantState();
 }
 
@@ -442,7 +468,7 @@ function revealAiResponse() {
     optionId: answerState.selectedOptionId,
   });
   persistState();
-  render();
+  renderStageAndFocus();
   void syncParticipantState();
 }
 
@@ -471,7 +497,7 @@ function finalizeCurrentQuestion(skipAi) {
     questionId: question.id,
     optionId: answerState.selectedOptionId,
     aiChecked: answerState.aiChecked,
-    skippedAi,
+    skippedAi: skipAi,
     totalDurationMs: answerState.totalDurationMs,
   });
 
@@ -485,7 +511,7 @@ function finalizeCurrentQuestion(skipAi) {
   }
 
   persistState();
-  render();
+  renderStageAndFocus();
   void syncParticipantState();
 }
 
@@ -530,7 +556,7 @@ function render() {
     <section class="surface progress-card">
       <div class="progress-meta">
         <div>
-          <p class="progress-caption">Tiến độ</p>
+          <p class="progress-caption">Progress</p>
           <strong>${progress.label}</strong>
         </div>
         <div class="inline-group">
@@ -572,7 +598,7 @@ function renderDeclined() {
     <section class="surface surface-content">
       <div class="section-heading">
         <p class="section-kicker">Session ended</p>
-        <h2>Không tham gia</h2>
+        <h2>End</h2>
       </div>
       <p class="summary-copy">${experimentContent.intro.declineCopy}</p>
     </section>
@@ -631,7 +657,6 @@ function renderQuestion() {
       <article class="surface question-card">
         <div class="question-meta">
           <div>
-            <p class="section-kicker">${experimentContent.quiz.title}</p>
             <h2>${question.id.toUpperCase()}</h2>
           </div>
           <span class="step-pill">Single choice</span>
