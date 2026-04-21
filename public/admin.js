@@ -121,6 +121,7 @@ function renderTable() {
         <tr>
           <td>${entry.participantId}</td>
           <td>${entry.conditionId ?? '—'}</td>
+          <td>${entry.difficultyLevel ?? '—'}</td>
           <td>${entry.currentStage ?? '—'}</td>
           <td>${entry.aiCheckCount ?? 0}</td>
           <td>${formatDateTime(entry.lastUpdatedAt)}</td>
@@ -135,6 +136,7 @@ function buildSummaryRows() {
     const row = {
       participantId: entry.participantId,
       conditionId: entry.conditionId,
+      difficultyLevel: entry.difficultyLevel,
       currentStage: entry.currentStage,
       actionCount: entry.actionCount,
       aiCheckCount: entry.aiCheckCount,
@@ -182,6 +184,7 @@ async function exportEvents() {
 
     return events.map((event) => ({
       participantId: entry.participantId,
+      difficultyLevel: entry.difficultyLevel ?? '',
       sequence: event.sequence,
       type: event.type,
       stage: event.stage,

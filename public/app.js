@@ -1,4 +1,10 @@
-import { experimentContent, getAiMessages, getConditionMatrix } from './experiment-content.js';
+import {
+  experimentContent,
+  getAiMessages,
+  getAllQuestions,
+  getConditionMatrix,
+  getQuestionsByDifficulty,
+} from './experiment-content.js';
 import {
   ensureParticipantAuth,
   isFirebaseEnabled,
@@ -14,11 +20,11 @@ import {
   generateParticipantId,
 } from './shared.js';
 
-const STATE_VERSION = 1;
+const STATE_VERSION = 2;
 const conditionMatrix = getConditionMatrix();
-const questionsById = Object.fromEntries(
-  experimentContent.questions.map((question) => [question.id, question]),
-);
+const allQuestions = getAllQuestions();
+const questionCountPerDifficulty = getQuestionsByDifficulty('low').length;
+const questionsById = Object.fromEntries(allQuestions.map((question) => [question.id, question]));
 
 const appTitle = document.querySelector('#app-title');
 const appRoot = document.querySelector('#app-root');
@@ -41,6 +47,7 @@ function renderStageAndFocus(smooth = true) {
 
   const selectorByStage = {
     consent: '.hero-grid',
+    difficulty: '.difficulty-card',
     question: '.question-card',
     survey: '.survey-card',
     complete: '.complete-card',
@@ -121,11 +128,13 @@ function createBlankState() {
     declined: false,
     conditionId: null,
     conditionValues: {},
-    questionOrder: experimentContent.questions.map((question) => question.id),
+    difficultyLevel: null,
+    difficultySelectedAt: null,
+    questionOrder: [],
     currentStage: 'consent',
     currentQuestionIndex: 0,
     answers: Object.fromEntries(
-      experimentContent.questions.map((question) => [question.id, createAnswerState()]),
+      allQuestions.map((question) => [question.id, createAnswerState()]),
     ),
     survey: {
       startedAt: null,
@@ -154,7 +163,7 @@ function normalizeState(candidate) {
         ? candidate.questionOrder
         : base.questionOrder,
     answers: Object.fromEntries(
-      experimentContent.questions.map((question) => [
+      allQuestions.map((question) => [
         question.id,
         {
           ...createAnswerState(),
@@ -204,13 +213,35 @@ function initializeParticipantSession() {
     hasConsented: true,
     conditionId: condition.id,
     conditionValues: clone(condition.values),
-    currentStage: 'question',
+    currentStage: 'difficulty',
   };
 
   recordEvent('participant_initialized', {
-    questionOrder: state.questionOrder,
+    availableDifficultyLevels: Object.keys(experimentContent.questionBanks),
   });
   recordEvent('consent_granted');
+  persistState();
+  renderStageAndFocus();
+  void syncParticipantState();
+}
+
+function selectDifficulty(difficultyLevel) {
+  const questionOrder = getQuestionsByDifficulty(difficultyLevel).map((question) => question.id);
+
+  if (!questionOrder.length) {
+    return;
+  }
+
+  state.difficultyLevel = difficultyLevel;
+  state.difficultySelectedAt = Date.now();
+  state.questionOrder = questionOrder;
+  state.currentQuestionIndex = 0;
+  state.currentStage = 'question';
+
+  recordEvent('difficulty_selected', {
+    difficultyLevel,
+    questionOrder,
+  });
   ensureQuestionViewLogged();
   persistState();
   renderStageAndFocus();
@@ -328,6 +359,8 @@ function buildSnapshotPayload() {
     currentStage: state.currentStage,
     currentQuestionIndex: state.currentQuestionIndex,
     questionOrder: state.questionOrder,
+    difficultyLevel: state.difficultyLevel,
+    difficultySelectedAt: state.difficultySelectedAt,
     answers,
     aiCheckCount: Object.values(state.answers).filter((entry) => entry.aiChecked).length,
     actionCount: state.sequence,
@@ -374,6 +407,11 @@ function handleClick(event) {
 
   if (action === 'select-option') {
     selectOption(actionElement.dataset.optionId);
+    return;
+  }
+
+  if (action === 'select-difficulty') {
+    selectDifficulty(actionElement.dataset.difficultyLevel);
     return;
   }
 
@@ -511,7 +549,7 @@ function finalizeCurrentQuestion(skipAi) {
 }
 
 function getProgressModel() {
-  const totalSteps = experimentContent.questions.length + 2;
+  const totalSteps = questionCountPerDifficulty + 4;
 
   if (!state.sessionInitialized) {
     return {
@@ -521,11 +559,19 @@ function getProgressModel() {
     };
   }
 
+  if (state.currentStage === 'difficulty') {
+    return {
+      current: 2,
+      total: totalSteps,
+      label: 'Difficulty selection',
+    };
+  }
+
   if (state.currentStage === 'question') {
     return {
-      current: state.currentQuestionIndex + 2,
+      current: state.currentQuestionIndex + 3,
       total: totalSteps,
-      label: `Câu ${state.currentQuestionIndex + 1}/${experimentContent.questions.length}`,
+      label: `${state.difficultyLevel ?? 'Question'} ${state.currentQuestionIndex + 1}/${state.questionOrder.length}`,
     };
   }
 
@@ -552,6 +598,7 @@ function render() {
       <div class="progress-meta">
         <div>
           <p class="progress-caption">Progress</p>
+          <strong>${progress.label}</strong>
         </div>
         <div class="inline-group">
           ${state.sessionInitialized ? `<span class="step-pill">Participant: ${state.participantId}</span>` : ''}
@@ -571,6 +618,11 @@ function render() {
 
   if (!state.sessionInitialized) {
     appRoot.insertAdjacentHTML('beforeend', renderConsent());
+    return;
+  }
+
+  if (state.currentStage === 'difficulty') {
+    appRoot.insertAdjacentHTML('beforeend', renderDifficulty());
     return;
   }
 
@@ -626,7 +678,7 @@ function renderConsent() {
             <input id="consent-checkbox" type="checkbox" />
             <span>${experimentContent.intro.consentLabel}</span>
           </label>
-          <p> Start the experiment?
+          <p>Start the experiment?</p>
           <div class="action-row">
             <button class="button primary" data-action="start-experiment" type="button">
               Yes
@@ -642,8 +694,49 @@ function renderConsent() {
   `;
 }
 
+function renderDifficulty() {
+  return `
+    <section class="surface difficulty-card surface-content">
+      <div class="section-heading">
+        <p class="section-kicker">Difficulty</p>
+        <h2>${experimentContent.difficulty.title}</h2>
+      </div>
+      <p class="summary-copy">${experimentContent.difficulty.helper}</p>
+      <div class="option-list">
+        ${experimentContent.difficulty.options
+          .map(
+            (option) => `
+              <button
+                class="option-card"
+                data-action="select-difficulty"
+                data-difficulty-level="${option.id}"
+                type="button"
+              >
+                <span class="option-badge">${option.id === 'low' ? 'L' : 'H'}</span>
+                <span class="option-text">
+                  <strong>${option.title}</strong><br />
+                  ${option.description}
+                </span>
+              </button>
+            `,
+          )
+          .join('')}
+      </div>
+    </section>
+  `;
+}
+
 function renderQuestion() {
   const question = getCurrentQuestion();
+
+  if (!question) {
+    return `
+      <section class="surface question-card">
+        <p class="summary-copy">No question set is currently active.</p>
+      </section>
+    `;
+  }
+
   const answerState = state.answers[question.id];
   const aiMessages = answerState.aiChecked
     ? getAiMessages(question.id, answerState.selectedOptionId, state.conditionId)
@@ -656,7 +749,7 @@ function renderQuestion() {
           <div>
             <h2>${question.id.toUpperCase()}</h2>
           </div>
-          <span class="step-pill">Single choice</span>
+          <span class="step-pill">${state.difficultyLevel === 'high' ? 'High difficulty' : 'Low difficulty'}</span>
         </div>
         <p class="question-prompt">${question.prompt}</p>
         <p class="helper-copy">${experimentContent.quiz.helper}</p>
@@ -792,8 +885,11 @@ function renderSurvey() {
 }
 
 function renderComplete() {
-  const answeredCount = Object.values(state.answers).filter((entry) => entry.selectedOptionId).length;
-  const aiChecks = Object.values(state.answers).filter((entry) => entry.aiChecked).length;
+  const answeredCount = state.questionOrder.filter(
+    (questionId) => state.answers[questionId]?.selectedOptionId,
+  ).length;
+  const aiChecks = state.questionOrder.filter((questionId) => state.answers[questionId]?.aiChecked)
+    .length;
 
   return `
     <section class="surface complete-card">
@@ -804,6 +900,7 @@ function renderComplete() {
       <p class="summary-copy">${experimentContent.complete.copy}</p>
       <div class="participant-code">Participant ID: ${state.participantId}</div>
       <ul class="detail-list">
+        <li>Difficulty selected: ${state.difficultyLevel ?? '—'}</li>
         <li>Số câu đã trả lời: ${answeredCount}/${state.questionOrder.length}</li>
         <li>Số lần bấm check AI: ${aiChecks}</li>
         <li>Thời điểm hoàn tất: ${formatDateTime(state.completedAt)}</li>
