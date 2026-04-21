@@ -552,7 +552,6 @@ function render() {
       <div class="progress-meta">
         <div>
           <p class="progress-caption">Progress</p>
-          <strong>${progress.label}</strong>
         </div>
         <div class="inline-group">
           ${state.sessionInitialized ? `<span class="step-pill">Participant: ${state.participantId}</span>` : ''}
@@ -591,10 +590,6 @@ function render() {
 function renderDeclined() {
   return `
     <section class="surface surface-content">
-      <div class="section-heading">
-        <p class="section-kicker">Session ended</p>
-        <h2>End</h2>
-      </div>
       <p class="summary-copy">${experimentContent.intro.declineCopy}</p>
     </section>
   `;
@@ -615,22 +610,29 @@ function renderConsent() {
       <aside class="surface hero-aside">
         <div class="section-heading">
           <p class="section-kicker">Consent</p>
-          <h2>Thông tin người tham gia</h2>
+          <h2>Researcher's info</h2>
         </div>
         <ul class="contact-list">
           ${experimentContent.intro.contact.map((item) => `<li>${item}</li>`).join('')}
         </ul>
+        <p>
+          Please read the consent form here:
+          <a href="https://example.com/consent-form" target="_blank" rel="noopener noreferrer">
+            Consent Form
+          </a>
+        </p>
         <div class="consent-block">
           <label class="checkbox-row">
             <input id="consent-checkbox" type="checkbox" />
             <span>${experimentContent.intro.consentLabel}</span>
           </label>
+          <p> Start the experiment?
           <div class="action-row">
             <button class="button primary" data-action="start-experiment" type="button">
-              Đồng ý và bắt đầu
+              Yes
             </button>
             <button class="button ghost" data-action="decline-experiment" type="button">
-              Không tham gia
+              No
             </button>
           </div>
           <p class="inline-status" id="consent-helper"></p>
@@ -687,11 +689,6 @@ function renderQuestion() {
             })
             .join('')}
         </div>
-        <ul class="detail-list">
-          <li>Đáp án được lưu ngay khi bạn bấm chọn.</li>
-          <li>Hệ thống không hiện đúng/sai ở bước này.</li>
-          <li>Thời gian trên từng bước được ghi lại trong background.</li>
-        </ul>
         <div class="action-row">
           <button
             class="button primary"
@@ -719,12 +716,11 @@ function renderQuestion() {
 
       <aside class="surface chat-card">
         <div class="section-heading">
-          <p class="section-kicker">${experimentContent.quiz.aiPanelTitle}</p>
-          <h2>Pre-scripted AI</h2>
+          <h2>Psych A.I.</h2>
         </div>
         <p class="helper-copy">${experimentContent.quiz.aiPanelCopy}</p>
         <div class="chat-thread">
-          <div class="chat-bubble system">Hệ thống chỉ hiển thị phản hồi cố định tương ứng với condition + câu hỏi + đáp án đã chọn.</div>
+          <div class="chat-bubble system">Hi, how can I help you?</div>
           ${
             answerState.selectedOptionId
               ? `
@@ -747,7 +743,7 @@ function renderQuestion() {
         <p class="chat-hint">
           ${
             answerState.totalDurationMs
-              ? `Thời gian câu này: ${formatDuration(answerState.totalDurationMs)}`
+              ? `Response time: ${formatDuration(answerState.totalDurationMs)}`
               : 'Phản hồi này không được sinh tự động theo thời gian thực.'
           }
         </p>

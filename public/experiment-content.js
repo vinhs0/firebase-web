@@ -158,28 +158,28 @@ const scriptedResponseTables = {
 export const experimentContent = {
   intro: {
     eyebrow: 'Interactive Media & Human Psychology Study',
-    title: 'Môi trường mô phỏng làm bài và kiểm tra đáp án với AI',
+    title: 'An environment simulating AI-assisted tasks',
     summary:
-      'Website này được thiết kế cho thí nghiệm online. Người tham gia sẽ làm một bài trắc nghiệm ngắn, sau đó có thể bấm “Check đáp án với AI” để xem phản hồi cố định đã được soạn sẵn.',
+      'This website is designed for an scientific experiment. You will complete a series of multiple choice questions, and you can check your answers with Psych AI - an AI chatbot for psychology needs.',
     bullets: [
       'Data is collected for scientific purposes.',
-      'Bạn có thể dừng tham gia bất kỳ lúc nào bằng cách đóng trang.',
+      'You must check your selected answer with Psych AI before going to the next question.',
+      'There are 2 difficulty levels. You can choose either of them to start.',
       'Survey length: 5-8 minutes.',
     ],
     contact: [ //Change this with your research team information.
-      'Nhóm nghiên cứu: Research Team',
-      'Liên hệ: researcher@example.com',
+      'Research team: (research team name)',
+      'Email: researcher@example.com',
       'Đơn vị: Interactive Media Lab',
     ],
     consentLabel:
       'I have read, and I agree to participate in this survey.',
     declineCopy:
-      'Bạn đã chọn không tham gia. Không có dữ liệu nào được gửi đi trong phiên này.',
+      'You have chosen not to participate in this survey.',
   },
   quiz: {
     helper:
       'Choose only one answer for each question. Afterwards, please press "Show AI response" to check your answer.',
-    aiPanelTitle: 'Phase 2: AI mô phỏng',
     aiPanelCopy:
       'Khung này chỉ hiển thị phản hồi đã được soạn sẵn theo từng trường hợp. Không có nhập liệu tự do.',
     checkButton: 'Show AI response',
