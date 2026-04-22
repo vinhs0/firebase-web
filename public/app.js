@@ -832,7 +832,7 @@ function renderComplete() {
         <h2>${experimentContent.complete.title}</h2>
       </div>
       <p class="summary-copy">${experimentContent.complete.copy}</p>
-      <div class="participant-code">Participant ID: ${state.participantId}</div>
+      <div class="participant-code">ID: ${state.participantId}</div>
       <ul class="detail-list">
         <li>Difficulty assigned: ${state.difficultyLevel ?? '—'}</li>
         <li>Thời điểm hoàn tất: ${formatDateTime(state.completedAt)}</li>
