@@ -701,7 +701,7 @@ function renderDifficulty() {
         <p class="section-kicker">Difficulty</p>
         <h2>${experimentContent.difficulty.title}</h2>
       </div>
-      <p class="summary-copy">${experimentContent.difficulty.helper}</p>
+      <p class="difficulty-copy">${experimentContent.difficulty.helper}</p>
       <div class="option-list">
         ${experimentContent.difficulty.options
           .map(
@@ -809,27 +809,27 @@ function renderQuestion() {
 
       <aside class="surface chat-card">
         <div class="section-heading">
-          <h2>Psych A.I.</h2>
+          <h2>Psych AI</h2>
         </div>
-        <p class="helper-copy">${experimentContent.quiz.aiPanelCopy}</p>
         <div class="chat-thread">
-          <div class="chat-bubble system">Hi, how can I help you?</div>
+          <div class="chat-bubble ai">Hi, I am Psych AI, a chatbot designed for human psychology studies. Let's start the conversation!</div>
+          <div class="chat-bubble ai">What is your choice for this question?</div>
           ${
             answerState.selectedOptionId
               ? `
                 <div class="chat-bubble user">
-                  Tôi đang nghiêng về phương án ${answerState.selectedOptionId}: ${
+                  I'm leaning towards answer ${answerState.selectedOptionId}: ${
                     question.options.find((entry) => entry.id === answerState.selectedOptionId)?.text
                   }
                 </div>
               `
-              : '<div class="chat-bubble ai">Chọn một đáp án trước để mở bước tương tác với AI.</div>'
+              : '<div class="chat-bubble system">Select an answer to start the conversation.</div>'
           }
           ${
             answerState.aiChecked
               ? aiMessages.map((message) => `<div class="chat-bubble ${message.role}">${message.text}</div>`).join('')
               : answerState.selectedOptionId
-                ? '<div class="chat-bubble ai">Nhấn “Check đáp án với AI” để xem phản hồi mô phỏng.</div>'
+                ? '<div class="chat-bubble system">Press "Show AI response" to check your answer with Psych AI.</div>'
                 : ''
           }
         </div>
@@ -837,7 +837,7 @@ function renderQuestion() {
           ${
             answerState.totalDurationMs
               ? `Response time: ${formatDuration(answerState.totalDurationMs)}`
-              : 'Phản hồi này không được sinh tự động theo thời gian thực.'
+              : ''
           }
         </p>
       </aside>
@@ -901,8 +901,6 @@ function renderComplete() {
       <div class="participant-code">Participant ID: ${state.participantId}</div>
       <ul class="detail-list">
         <li>Difficulty selected: ${state.difficultyLevel ?? '—'}</li>
-        <li>Số câu đã trả lời: ${answeredCount}/${state.questionOrder.length}</li>
-        <li>Số lần bấm check AI: ${aiChecks}</li>
         <li>Thời điểm hoàn tất: ${formatDateTime(state.completedAt)}</li>
       </ul>
     </section>

@@ -577,8 +577,6 @@ export const experimentContent = {
   quiz: {
     helper:
       'Choose only one answer for each question. Afterwards, please press "Show AI response" before moving to the next question.',
-    aiPanelCopy:
-      'This panel only displays pre-scripted responses. There is no free-text chat input.',
     checkButton: 'Show AI response',
     nextButton: 'Next question',
     finalButton: 'Final survey',
