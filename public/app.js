@@ -542,7 +542,7 @@ function getProgressModel() {
     return {
       current: state.currentQuestionIndex + 2,
       total: totalSteps,
-      label: `${state.difficultyLevel ?? 'Question'} ${state.currentQuestionIndex + 1}/${state.questionOrder.length}`,
+      label: `Question ${state.currentQuestionIndex + 1}/${state.questionOrder.length}`,
     };
   }
 
@@ -550,14 +550,14 @@ function getProgressModel() {
     return {
       current: totalSteps - 1,
       total: totalSteps,
-      label: 'Survey cuối',
+      label: 'Last survey',
     };
   }
 
   return {
     current: totalSteps,
     total: totalSteps,
-    label: 'Hoàn tất',
+    label: 'Completed',
   };
 }
 
@@ -568,12 +568,10 @@ function render() {
     <section class="surface progress-card">
       <div class="progress-meta">
         <div>
-          <p class="progress-caption">Progress</p>
-          <strong>${progress.label}</strong>
+          <p class="progress-caption">Progress bar</p>
         </div>
         <div class="inline-group">
-          ${state.sessionInitialized ? `<span class="step-pill">Participant: ${state.participantId}</span>` : ''}
-          <span class="step-pill">${progress.current}/${progress.total} bước</span>
+          <strong>${progress.label}</strong>
         </div>
       </div>
       <div class="progress-track">
@@ -681,9 +679,13 @@ function renderQuestion() {
       <article class="surface question-card">
         <div class="question-meta">
           <div>
-            <h2>${question.id.toUpperCase()}</h2>
+            <h2>${
+              question.id
+                ? question.id[0].toUpperCase() +
+                  (question.id.length > 1 ? question.id[question.id.length - 1].toUpperCase() : '')
+                : ''
+            }</h2>
           </div>
-          <span class="step-pill">${state.difficultyLevel === 'high' ? 'High difficulty' : 'Low difficulty'}</span>
         </div>
         <p class="question-prompt">${question.prompt}</p>
         <p class="helper-copy">${experimentContent.quiz.helper}</p>
@@ -746,7 +748,11 @@ function renderQuestion() {
           <h2>Psych AI</h2>
         </div>
         <div class="chat-thread">
-          <div class="chat-bubble ai">Hi, I am Psych AI, a chatbot designed for human psychology studies. Let's start the conversation!</div>
+          ${
+            state.currentQuestionIndex === 0
+              ? '<div class="chat-bubble ai">Hi, I am Psych AI, a chatbot designed for human psychology studies. Let\'s start the conversation!</div>'
+              : ''
+          }
           <div class="chat-bubble ai">What is your choice for this question?</div>
           ${
             answerState.selectedOptionId
@@ -789,7 +795,7 @@ function renderSurvey() {
         <p class="section-kicker">Final survey</p>
         <h2>${experimentContent.survey.title}</h2>
       </div>
-      <p class="summary-copy">${experimentContent.survey.copy}</p>
+      <p class="survey-copy">${experimentContent.survey.copy}</p>
       ${
         hasEmbed
           ? `<iframe class="survey-frame" src="${runtimeConfig.survey.embedUrl}" title="Final survey"></iframe>`
@@ -833,10 +839,7 @@ function renderComplete() {
       </div>
       <p class="summary-copy">${experimentContent.complete.copy}</p>
       <div class="participant-code">Participant ID: ${state.participantId}</div>
-      <ul class="detail-list">
-        <li>Difficulty assigned: ${state.difficultyLevel ?? '—'}</li>
-        <li>Thời điểm hoàn tất: ${formatDateTime(state.completedAt)}</li>
-      </ul>
+      <p> Thời điểm hoàn tất: ${formatDateTime(state.completedAt)}</p>
     </section>
   `;
 }

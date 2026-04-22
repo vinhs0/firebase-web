@@ -572,7 +572,7 @@ export const experimentContent = {
   complete: {
     title: 'Thank you for participating',
     copy:
-      'The experiment session is complete. You may now close this page. The participant ID is shown below for record matching if needed.',
+      'The experiment is complete. You may now close this page. The participant ID is shown below for record matching if needed.',
   },
   factors: [
     {
