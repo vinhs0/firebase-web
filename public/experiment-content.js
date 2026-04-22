@@ -540,11 +540,11 @@ export const experimentContent = {
     eyebrow: 'Interactive Media & Human Psychology Study',
     title: 'An environment simulating AI-assisted tasks',
     summary:
-      'This website is designed for a scientific experiment. You will choose a difficulty level, complete a short multiple-choice task set, and review each answer through a scripted Psych AI response.',
+      'This website is designed for a scientific experiment. You will complete a short multiple-choice task set and review each answer through a scripted Psych AI response.',
     bullets: [
       'Data is collected for scientific purposes only.',
       'You must check your selected answer with Psych AI before going to the next question.',
-      'You can choose either the low or high difficulty question set before starting the quiz.',
+      'A low- or high-difficulty question set will be assigned automatically and remain fixed during the session.',
       'Survey length: 5-8 minutes.',
     ],
     contact: [
@@ -554,25 +554,6 @@ export const experimentContent = {
     ],
     consentLabel: 'I have read the information above and agree to participate in this study.',
     declineCopy: 'You have chosen not to participate in this survey.',
-  },
-  difficulty: {
-    title: 'Choose a difficulty level',
-    helper:
-      'Please choose which question set you want to complete. Your selection stays fixed for the rest of the session.',
-    options: [
-      {
-        id: 'low',
-        title: 'Low difficulty',
-        description:
-          'Shorter and more direct wording. Suitable if you want clearer, easier-to-parse question prompts.',
-      },
-      {
-        id: 'high',
-        title: 'High difficulty',
-        description:
-          'Denser and more formal wording. Suitable if you want more complex framing and interpretation demands.',
-      },
-    ],
   },
   quiz: {
     helper:

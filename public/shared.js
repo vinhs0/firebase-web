@@ -30,15 +30,18 @@ export function buildConditionMatrix(factors) {
   ).filter((entry) => Object.keys(entry.values).length > 0);
 }
 
-export function generateParticipantId() {
+export function generateParticipantId(difficultyLevel) {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const bytes = new Uint8Array(6);
+  const bytes = new Uint8Array(10);
   crypto.getRandomValues(bytes);
 
   const code = Array.from(bytes, (value) => alphabet[value % alphabet.length]).join('');
-  const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const normalizedDifficulty =
+    typeof difficultyLevel === 'string' && difficultyLevel.trim()
+      ? difficultyLevel.trim().toUpperCase()
+      : 'participant';
 
-  return `P-${datePart}-${code}`;
+  return `${normalizedDifficulty}-${code}`;
 }
 
 export function chooseRandomItem(items) {
@@ -53,7 +56,7 @@ export function formatDateTime(timestamp) {
   }
 
   const date = new Date(timestamp);
-  return new Intl.DateTimeFormat('vi-VN', {
+  return new Intl.DateTimeFormat('en-GB', {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(date);

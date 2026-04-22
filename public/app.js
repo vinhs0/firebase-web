@@ -20,7 +20,7 @@ import {
   generateParticipantId,
 } from './shared.js';
 
-const STATE_VERSION = 2;
+const STATE_VERSION = 3;
 const conditionMatrix = getConditionMatrix();
 const allQuestions = getAllQuestions();
 const questionCountPerDifficulty = getQuestionsByDifficulty('low').length;
@@ -47,7 +47,6 @@ function renderStageAndFocus(smooth = true) {
 
   const selectorByStage = {
     consent: '.hero-grid',
-    difficulty: '.difficulty-card',
     question: '.question-card',
     survey: '.survey-card',
     complete: '.complete-card',
@@ -129,7 +128,7 @@ function createBlankState() {
     conditionId: null,
     conditionValues: {},
     difficultyLevel: null,
-    difficultySelectedAt: null,
+    difficultyAssignedAt: null,
     questionOrder: [],
     currentStage: 'consent',
     currentQuestionIndex: 0,
@@ -201,47 +200,32 @@ function setSyncStatus(mode, message) {
 
 function initializeParticipantSession() {
   const condition = chooseRandomItem(conditionMatrix);
+  const difficultyLevel = chooseRandomItem(Object.keys(experimentContent.questionBanks));
+  const questionOrder = getQuestionsByDifficulty(difficultyLevel).map((question) => question.id);
   const freshState = createBlankState();
   const now = Date.now();
 
   state = {
     ...freshState,
     sessionInitialized: true,
-    participantId: generateParticipantId(),
+    participantId: generateParticipantId(difficultyLevel),
     createdAt: now,
     consentedAt: now,
     hasConsented: true,
     conditionId: condition.id,
     conditionValues: clone(condition.values),
-    currentStage: 'difficulty',
+    difficultyLevel,
+    difficultyAssignedAt: now,
+    questionOrder,
+    currentStage: 'question',
   };
 
   recordEvent('participant_initialized', {
-    availableDifficultyLevels: Object.keys(experimentContent.questionBanks),
-  });
-  recordEvent('consent_granted');
-  persistState();
-  renderStageAndFocus();
-  void syncParticipantState();
-}
-
-function selectDifficulty(difficultyLevel) {
-  const questionOrder = getQuestionsByDifficulty(difficultyLevel).map((question) => question.id);
-
-  if (!questionOrder.length) {
-    return;
-  }
-
-  state.difficultyLevel = difficultyLevel;
-  state.difficultySelectedAt = Date.now();
-  state.questionOrder = questionOrder;
-  state.currentQuestionIndex = 0;
-  state.currentStage = 'question';
-
-  recordEvent('difficulty_selected', {
     difficultyLevel,
     questionOrder,
   });
+  recordEvent('consent_granted');
+  recordEvent('difficulty_assigned', { difficultyLevel });
   ensureQuestionViewLogged();
   persistState();
   renderStageAndFocus();
@@ -360,7 +344,7 @@ function buildSnapshotPayload() {
     currentQuestionIndex: state.currentQuestionIndex,
     questionOrder: state.questionOrder,
     difficultyLevel: state.difficultyLevel,
-    difficultySelectedAt: state.difficultySelectedAt,
+    difficultyAssignedAt: state.difficultyAssignedAt,
     answers,
     aiCheckCount: Object.values(state.answers).filter((entry) => entry.aiChecked).length,
     actionCount: state.sequence,
@@ -407,11 +391,6 @@ function handleClick(event) {
 
   if (action === 'select-option') {
     selectOption(actionElement.dataset.optionId);
-    return;
-  }
-
-  if (action === 'select-difficulty') {
-    selectDifficulty(actionElement.dataset.difficultyLevel);
     return;
   }
 
@@ -549,7 +528,7 @@ function finalizeCurrentQuestion(skipAi) {
 }
 
 function getProgressModel() {
-  const totalSteps = questionCountPerDifficulty + 4;
+  const totalSteps = questionCountPerDifficulty + 3;
 
   if (!state.sessionInitialized) {
     return {
@@ -559,17 +538,9 @@ function getProgressModel() {
     };
   }
 
-  if (state.currentStage === 'difficulty') {
-    return {
-      current: 2,
-      total: totalSteps,
-      label: 'Difficulty selection',
-    };
-  }
-
   if (state.currentStage === 'question') {
     return {
-      current: state.currentQuestionIndex + 3,
+      current: state.currentQuestionIndex + 2,
       total: totalSteps,
       label: `${state.difficultyLevel ?? 'Question'} ${state.currentQuestionIndex + 1}/${state.questionOrder.length}`,
     };
@@ -618,11 +589,6 @@ function render() {
 
   if (!state.sessionInitialized) {
     appRoot.insertAdjacentHTML('beforeend', renderConsent());
-    return;
-  }
-
-  if (state.currentStage === 'difficulty') {
-    appRoot.insertAdjacentHTML('beforeend', renderDifficulty());
     return;
   }
 
@@ -690,38 +656,6 @@ function renderConsent() {
           <p class="inline-status" id="consent-helper"></p>
         </div>
       </aside>
-    </section>
-  `;
-}
-
-function renderDifficulty() {
-  return `
-    <section class="surface difficulty-card surface-content">
-      <div class="section-heading">
-        <p class="section-kicker">Difficulty</p>
-        <h2>${experimentContent.difficulty.title}</h2>
-      </div>
-      <p class="difficulty-copy">${experimentContent.difficulty.helper}</p>
-      <div class="option-list">
-        ${experimentContent.difficulty.options
-          .map(
-            (option) => `
-              <button
-                class="option-card"
-                data-action="select-difficulty"
-                data-difficulty-level="${option.id}"
-                type="button"
-              >
-                <span class="option-badge">${option.id === 'low' ? 'L' : 'H'}</span>
-                <span class="option-text">
-                  <strong>${option.title}</strong><br />
-                  ${option.description}
-                </span>
-              </button>
-            `,
-          )
-          .join('')}
-      </div>
     </section>
   `;
 }
@@ -900,7 +834,7 @@ function renderComplete() {
       <p class="summary-copy">${experimentContent.complete.copy}</p>
       <div class="participant-code">Participant ID: ${state.participantId}</div>
       <ul class="detail-list">
-        <li>Difficulty selected: ${state.difficultyLevel ?? '—'}</li>
+        <li>Difficulty assigned: ${state.difficultyLevel ?? '—'}</li>
         <li>Thời điểm hoàn tất: ${formatDateTime(state.completedAt)}</li>
       </ul>
     </section>
