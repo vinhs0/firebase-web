@@ -1,6 +1,6 @@
 .firebase/
 firebase-debug.log
 firestore-debug.log
-.env
 public/__env.js
 node_modules
+firestone.rules

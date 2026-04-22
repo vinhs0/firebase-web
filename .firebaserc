@@ -1,6 +1,7 @@
 {
   "projects": {
-    "ai-qna": "ai-qna-9549c"
+    "ai-qna": "ai-qna-9549c",
+    "default": "ai-qna-9549c"
   },
   "targets": {},
   "etags": {}
