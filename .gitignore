@@ -3,4 +3,4 @@ firebase-debug.log
 firestore-debug.log
 public/__env.js
 node_modules
-firestone.rules
+firestore.rules
