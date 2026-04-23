@@ -81,7 +81,7 @@ async function boot() {
       setSyncStatus('error', `Không thể mở Firebase session: ${error.message}`);
     }
   } else if (isFirebaseEnabled()) {
-    setSyncStatus('idle', 'Sẵn sàng đồng bộ với Firebase');
+    setSyncStatus('idle', 'Firebase');
   } else if (!isFirebaseEnabled()) {
     setSyncStatus('idle', 'Local preview mode');
   }
