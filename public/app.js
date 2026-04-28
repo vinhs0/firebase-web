@@ -81,9 +81,9 @@ async function boot() {
       setSyncStatus('error', `Không thể mở Firebase session: ${error.message}`);
     }
   } else if (isFirebaseEnabled()) {
-    setSyncStatus('idle', 'Firebase');
+    setSyncStatus('idle', '');
   } else if (!isFirebaseEnabled()) {
-    setSyncStatus('idle', 'Local preview mode');
+    setSyncStatus('idle', 'Local');
   }
 
   if (state.currentStage === 'question') {
@@ -617,25 +617,57 @@ function renderConsent() {
       <article class="surface surface-content">
         <p class="eyebrow">${experimentContent.intro.eyebrow}</p>
         <h2>${experimentContent.intro.title}</h2>
-        <p class="summary-copy">${experimentContent.intro.summary}</p>
-        <ul class="bullet-list">
-          ${experimentContent.intro.bullets.map((item) => `<li>${item}</li>`).join('')}
-        </ul>
+        <div class="summary-copy"> 
+          <p>Thank you for taking the time to participate in this study. This research aims to better understand how people make decisions and interact with AI systems in everyday tasks.</p>
+          
+          <p>Your responses will help us gain insights into how people use AI to support their thinking and decision-making.</p>
+        </div>
+        <div class="accordion-container">
+          <details>
+            <summary><strong>What you will do</strong></summary>
+            <p class="summary-copy">You will complete a series of short reasoning and decision-making tasks. For each task, you will first select an answer based on your own judgment, and then view a response from an AI system. After completing the tasks, you will be directed to a short questionnaire on a separate page. Please make sure to complete both parts for your responses to be recorded. We kindly ask you to respond as carefully and sincerely as possible.</p>
+          </details>
+
+          <details>
+            <summary><strong>Time required</strong></summary>
+            <p class="summary-copy">The study will take approximately 10~15 minutes.</p>
+          </details>
+
+          <details>
+            <summary><strong>Voluntary participation</strong></summary>
+            <p class="summary-copy">Your participation is entirely voluntary. You may stop participating at any time without any disadvantage or penalty.</p>
+          </details>
+
+          <details>
+            <summary><strong>Confidentiality</strong></summary>
+            <p class="summary-copy">All responses will be kept confidential and used for research purposes only. No personally identifying information will be linked to your responses.</p>
+          </details>
+
+          <details>
+            <summary><strong>Risks and discomfort</strong></summary>
+            <p class="summary-copy">There are no known risks beyond those encountered in everyday activities. You may skip any question you do not wish to answer.</p>
+          </details>
+
+          <details>
+            <summary><strong>Study procedure notice</strong></summary>
+            <p class="summary-copy">To ensure the validity of the research, some aspects of the study cannot be fully explained in advance. A full explanation will be provided at the end of the study.</p>
+          </details>
+        </div>
       </article>
 
       <aside class="surface hero-aside">
         <div class="section-heading">
-          <p class="section-kicker">Consent</p>
-          <h2>Researcher's info</h2>
+          <p class="section-kicker">Contact</p>
+          <h2>Contact information</h2>
         </div>
-        <ul class="contact-list">
-          ${experimentContent.intro.contact.map((item) => `<li>${item}</li>`).join('')}
-        </ul>
-        <p>
-          Please read the consent form here:
-          <a href="https://example.com/consent-form" target="_blank" rel="noopener noreferrer">
-            Consent Form
-          </a>
+        <div class="summary-copy"> 
+          <p>If you have any questions about this study, please feel free to contact: Nguyen Phuong Ngoc (지원).</p>
+          <p>
+            Email: <a href="mailto:ngocnguyen@ewha.ac.kr" class="email-link">ngocnguyen@ewha.ac.kr</a>
+          </p>
+        </div>
+        <p class="summary-copy">
+          Please read the consent before the experiment. By clicking “I agree and continue,” you confirm that you have read and understood the information above and voluntarily agree to participate in this study.
         </p>
         <div class="consent-block">
           <label class="checkbox-row">
@@ -769,7 +801,7 @@ function renderQuestion() {
             answerState.aiChecked
               ? aiMessages.map((message) => `<div class="chat-bubble ${message.role}">${message.text}</div>`).join('')
               : answerState.selectedOptionId
-                ? '<div class="chat-bubble system">Press "Show AI response" to check your answer with Psych AI.</div>'
+                ? '<div class="chat-bubble system">Press "Ask Psych AI" to check your answer with Psych AI.</div>'
                 : ''
           }
         </div>
@@ -801,8 +833,7 @@ function renderSurvey() {
           ? `<iframe class="survey-frame" src="${runtimeConfig.survey.embedUrl}" title="Final survey"></iframe>`
           : `
             <div class="survey-placeholder">
-              <p>Chưa có survey embed URL trong <code>public/firebase-config.js</code>.</p>
-              <p>Điền link Google Form của bạn vào <code>survey.embedUrl</code> hoặc <code>survey.fallbackUrl</code>.</p>
+              <p>ERROR: No survey's links found in <code>public/firebase-config.js</code>.</p>
             </div>
           `
       }

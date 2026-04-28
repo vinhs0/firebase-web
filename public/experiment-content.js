@@ -537,16 +537,8 @@ const allQuestions = [...lowQuestions, ...highQuestions];
 
 export const experimentContent = {
   intro: {
-    eyebrow: 'Interactive Media & Human Psychology Study',
+    eyebrow: 'Study information & Consent',
     title: 'An environment simulating AI-assisted tasks',
-    summary:
-      'This website is designed for a scientific experiment. You will complete a short multiple-choice task set and review each answer through a scripted Psych AI response.',
-    bullets: [
-      'Data is collected for scientific purposes only.',
-      'You must check your selected answer with Psych AI before going to the next question.',
-      'A low- or high-difficulty question set will be assigned automatically and remain fixed during the session.',
-      'Survey length: 5-8 minutes.',
-    ],
     contact: [
       'Research team: (research team name)',
       'Email: researcher@example.com',
@@ -557,8 +549,8 @@ export const experimentContent = {
   },
   quiz: {
     helper:
-      'Choose only one answer for each question. Afterwards, please press "Show AI response" before moving to the next question.',
-    checkButton: 'Show AI response',
+      'Choose only one answer for each question. Afterwards, please press "Ask Psych AI" before moving to the next question.',
+    checkButton: 'Ask Psych AI',
     nextButton: 'Next question',
     finalButton: 'Final survey',
   },
