@@ -552,7 +552,7 @@ export const experimentContent = {
       'Email: researcher@example.com',
       'Lab: Interactive Media Lab',
     ],
-    consentLabel: 'I have read the information above and agree to participate in this study.',
+    consentLabel: 'I agree and continue.',
     declineCopy: 'You have chosen not to participate in this survey.',
   },
   quiz: {

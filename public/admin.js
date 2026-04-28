@@ -38,7 +38,7 @@ signoutButton.addEventListener('click', async () => {
   renderMetrics();
   renderTable();
   dashboard.classList.add('hidden');
-  authStatus.textContent = 'Đã đăng xuất.';
+  authStatus.textContent = 'Logged out.';
 });
 exportSummaryButton.addEventListener('click', exportSummary);
 exportEventsButton.addEventListener('click', () => {
@@ -50,7 +50,7 @@ exportJsonButton.addEventListener('click', () => {
 
 if (!isFirebaseEnabled()) {
   authStatus.textContent =
-    'Firebase đang tắt trong public/firebase-config.js. Bật enableFirebaseSync để dùng admin dashboard.';
+    'Let enableFirebaseSync = true to use admin.';
 }
 
 async function handleLogin(event) {
@@ -60,11 +60,11 @@ async function handleLogin(event) {
     return;
   }
 
-  authStatus.textContent = 'Đang đăng nhập...';
+  authStatus.textContent = 'Logging in...';
 
   try {
     await signInAdmin(emailField.value.trim(), passwordField.value);
-    authStatus.textContent = 'Đăng nhập thành công.';
+    authStatus.textContent = 'Logged in.';
     dashboard.classList.remove('hidden');
     await refreshDashboard();
   } catch (error) {
