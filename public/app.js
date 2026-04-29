@@ -563,7 +563,7 @@ function getProgressModel() {
   }
 
   if (state.currentStage === 'attitude-survey') {
-    return { current: 2, total: totalSteps, label: 'General Attitudes' };
+    return { current: 2, total: totalSteps, label: 'General' };
   }
 
   if (state.currentStage === 'question') {
@@ -937,9 +937,49 @@ function renderComplete() {
         <p class="section-kicker">Completed</p>
         <h2>${experimentContent.complete.title}</h2>
       </div>
-      <p class="summary-copy">${experimentContent.complete.copy}</p>
-      <div class="participant-code">ID: ${state.participantId}</div>
-      <p> Thời điểm hoàn tất: ${formatDateTime(state.completedAt)}</p>
+      <div class="summary-copy">
+        <p>Thank you for completing the study.</p>
+
+        <p>Your responses have been successfully recorded, and your participation is greatly appreciated.</p>
+
+        <p>
+          The purpose of this research is to understand how people interact with AI systems, 
+          particularly how AI responses may influence users\' thinking and decision-making.
+        </p>
+
+        <p>
+          During the study, the AI responses you saw were pre-programmed and not generated in real time. 
+          In some cases, the AI was designed to agree with your answer regardless of whether it was correct. 
+          This was done to examine how different types of AI responses may affect users\' reliance on the system. 
+          In particular, this study examines how AI agreement may influence users\' trust in the system and 
+          their reliance on AI rather than their own reasoning.
+        </p>
+
+        <p>
+          Because of this design, the AI responses should not be interpreted as accurate or authoritative 
+          feedback on your answers.
+        </p>
+
+        <p>
+          We understand that this may feel unexpected. Please note that the goal of this study is not to 
+          evaluate your performance, but to better understand how people respond to AI systems in 
+          decision-making situations.
+        </p>
+
+        <p>All of your responses will be kept confidential and used for research purposes only.</p>
+
+        <p>
+          If you would like to withdraw your data after learning about the study\'s purpose, 
+          please contact the researcher, and your responses will be removed.
+        </p>
+      </div>
+      <div class="summary-copy">
+        <h3>Contact Information</h3>
+        <p>Nguyen Phuong Ngoc (지원)</p>
+        <p>
+          Email: <a href="mailto:ngocnguyen@ewha.ac.kr" class="email-link">ngocnguyen@ewha.ac.kr</a>
+        </p>
+      </div>
     </section>
   `;
 }

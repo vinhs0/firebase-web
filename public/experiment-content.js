@@ -517,7 +517,7 @@ export const experimentContent = {
     declineCopy: 'You have chosen not to participate in this survey.',
   },
   attitudeSurvey: {
-    title: 'General Attitudes',
+    title: 'Your view on AI',
     intro: 'Welcome. You will begin with a short questionnaire about your general attitudes.',
     instruction: 'Please respond based on your own experience and indicate how much you agree with each statement below.',
     labels: { left: '1 (Strongly disagree)', right: '7 (Strongly agree)' },
