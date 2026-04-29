@@ -146,6 +146,13 @@ function buildSummaryRows() {
       surveyAcknowledgedAt: formatDateTime(entry.surveyAcknowledgedAt),
     };
 
+    row['att1_impression'] = entry.attitudeSurvey?.answers?.att1 ?? '';
+    row['att2_comfortable'] = entry.attitudeSurvey?.answers?.att2 ?? '';
+    row['att3_favorable'] = entry.attitudeSurvey?.answers?.att3 ?? '';
+    row['att4_interested'] = entry.attitudeSurvey?.answers?.att4 ?? '';
+    row['att5_exciting'] = entry.attitudeSurvey?.answers?.att5 ?? '';
+    row['att6_beneficial'] = entry.attitudeSurvey?.answers?.att6 ?? ''; 
+
     experimentContent.questions.forEach((question) => {
       const answer = entry.answers?.[question.id] ?? {};
       row[`${question.id}_answer`] = answer.selectedOptionId ?? '';

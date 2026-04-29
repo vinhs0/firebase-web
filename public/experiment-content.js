@@ -516,6 +516,21 @@ export const experimentContent = {
     consentLabel: 'I agree and continue.',
     declineCopy: 'You have chosen not to participate in this survey.',
   },
+  attitudeSurvey: {
+    title: 'General Attitudes',
+    intro: 'Welcome. You will begin with a short questionnaire about your general attitudes.',
+    instruction: 'Please respond based on your own experience and indicate how much you agree with each statement below.',
+    labels: { left: '1 (Strongly disagree)', right: '7 (Strongly agree)' },
+    questions: [
+      { id: 'att1', text: 'I have a positive impression of AI systems.' },
+      { id: 'att2', text: 'I feel comfortable using AI technologies.' },
+      { id: 'att3', text: 'I am generally favorable toward AI.' },
+      { id: 'att4', text: 'I am interested in using AI in different situations.' },
+      { id: 'att5', text: 'AI is exciting.' },
+      { id: 'att6', text: 'There are many beneficial applications of AI.' }
+    ],
+    nextButton: 'Continue to tasks'
+  },
   quiz: {
     helper:
       'Choose only one answer for each question. Afterwards, please press "Ask Psych AI" before moving to the next question.',

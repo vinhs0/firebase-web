@@ -346,6 +346,75 @@ body::before {
   margin: 0;
 }
 
+/* Attitude Survey Styles */
+.attitude-list {
+  display: grid;
+  gap: 36px;
+  margin: 28px 0;
+}
+
+.attitude-item p {
+  margin: 0 0 16px;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.likert-scale {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.likert-radios {
+  display: flex;
+  gap: 12px;
+  background: rgba(22, 32, 29, 0.04);
+  padding: 10px 16px;
+  border-radius: 999px;
+}
+
+.likert-radio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  min-width: 24px;
+}
+
+.likert-radio input {
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.likert-radio span {
+  font-size: 0.9rem;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.likert-bound {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .likert-scale {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .likert-radios {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
 .option-list {
   display: grid;
   gap: 14px;

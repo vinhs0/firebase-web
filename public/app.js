@@ -23,7 +23,7 @@ import {
 const STATE_VERSION = 3;
 const conditionMatrix = getConditionMatrix();
 const allQuestions = getAllQuestions();
-const questionCountPerDifficulty = getQuestionsByDifficulty('low').length;
+const questionCountPerDifficulty = getQuestionsByDifficulty('wdl').length;
 const questionsById = Object.fromEntries(allQuestions.map((question) => [question.id, question]));
 
 const appTitle = document.querySelector('#app-title');
@@ -36,6 +36,7 @@ let state = normalizeState(loadState());
 let syncInFlight = false;
 
 appRoot.addEventListener('click', handleClick);
+appRoot.addEventListener('change', handleChange);
 window.addEventListener('online', () => {
   void syncParticipantState();
 });
@@ -135,6 +136,10 @@ function createBlankState() {
     answers: Object.fromEntries(
       allQuestions.map((question) => [question.id, createAnswerState()]),
     ),
+    attitudeSurvey: {
+      answers: {},
+      completedAt: null,
+    },
     survey: {
       startedAt: null,
       acknowledgedAt: null,
@@ -170,6 +175,10 @@ function normalizeState(candidate) {
         },
       ]),
     ),
+    attitudeSurvey: {
+      answers: candidate.attitudeSurvey?.answers ?? {},
+      completedAt: candidate.attitudeSurvey?.completedAt ?? null,
+    },
     survey: {
       ...base.survey,
       ...(candidate.survey ?? {}),
@@ -217,7 +226,7 @@ function initializeParticipantSession() {
     difficultyLevel,
     difficultyAssignedAt: now,
     questionOrder,
-    currentStage: 'question',
+    currentStage: 'attitude-survey',
   };
 
   recordEvent('participant_initialized', {
@@ -389,6 +398,17 @@ function handleClick(event) {
     return;
   }
 
+  if (action === 'finish-attitude-survey') {
+    state.attitudeSurvey.completedAt = Date.now();
+    state.currentStage = 'question';
+    ensureQuestionViewLogged();
+    recordEvent('attitude_survey_completed');
+    persistState();
+    renderStageAndFocus();
+    void syncParticipantState();
+    return;
+  }
+
   if (action === 'select-option') {
     selectOption(actionElement.dataset.optionId);
     return;
@@ -425,6 +445,14 @@ function handleClick(event) {
     persistState();
     renderStageAndFocus();
     void syncParticipantState();
+  }
+}
+
+function handleChange(event) {
+  if (event.target.dataset.action === 'select-attitude') {
+    state.attitudeSurvey.answers[event.target.dataset.questionId] = event.target.value;
+    persistState();
+    renderStageAndFocus(false); // Re-render to unlock the continue button if all answered
   }
 }
 
@@ -528,37 +556,29 @@ function finalizeCurrentQuestion(skipAi) {
 }
 
 function getProgressModel() {
-  const totalSteps = questionCountPerDifficulty + 3;
+  const totalSteps = questionCountPerDifficulty + 4;
 
   if (!state.sessionInitialized) {
-    return {
-      current: state.declined ? 0 : 1,
-      total: totalSteps,
-      label: 'Consent',
-    };
+    return { current: state.declined ? 0 : 1, total: totalSteps, label: 'Consent' };
+  }
+
+  if (state.currentStage === 'attitude-survey') {
+    return { current: 2, total: totalSteps, label: 'General Attitudes' };
   }
 
   if (state.currentStage === 'question') {
     return {
-      current: state.currentQuestionIndex + 2,
+      current: state.currentQuestionIndex + 3,
       total: totalSteps,
       label: `Question ${state.currentQuestionIndex + 1}/${state.questionOrder.length}`,
     };
   }
 
   if (state.currentStage === 'survey') {
-    return {
-      current: totalSteps - 1,
-      total: totalSteps,
-      label: 'Last survey',
-    };
+    return { current: totalSteps - 1, total: totalSteps, label: 'Last survey' };
   }
 
-  return {
-    current: totalSteps,
-    total: totalSteps,
-    label: 'Completed',
-  };
+  return { current: totalSteps, total: totalSteps, label: 'Completed' };
 }
 
 function render() {
@@ -587,6 +607,11 @@ function render() {
 
   if (!state.sessionInitialized) {
     appRoot.insertAdjacentHTML('beforeend', renderConsent());
+    return;
+  }
+
+  if (state.currentStage === 'attitude-survey') {
+    appRoot.insertAdjacentHTML('beforeend', renderAttitudeSurvey());
     return;
   }
 
@@ -684,6 +709,53 @@ function renderConsent() {
           <p class="inline-status" id="consent-helper"></p>
         </div>
       </aside>
+    </section>
+  `;
+}
+
+function renderAttitudeSurvey() {
+  const content = experimentContent.attitudeSurvey;
+  const answers = state.attitudeSurvey.answers;
+  // Check if all 6 questions have a selected answer
+  const allAnswered = content.questions.every((q) => answers[q.id]);
+
+  return `
+    <section class="surface question-card">
+      <div class="section-heading">
+        <h2>${content.title}</h2>
+      </div>
+      <div class="summary-copy">
+        <p>${content.intro}</p>
+        <p><strong>${content.instruction}</strong></p>
+      </div>
+
+      <div class="attitude-list">
+        ${content.questions.map((q, i) => `
+          <div class="attitude-item">
+            <p>${i + 1}. ${q.text}</p>
+            <div class="likert-scale">
+              <span class="likert-bound">${content.labels.left}</span>
+              <div class="likert-radios">
+                ${[1, 2, 3, 4, 5, 6, 7].map(val => `
+                  <label class="likert-radio">
+                    <input type="radio" name="${q.id}" value="${val}" 
+                      data-action="select-attitude" data-question-id="${q.id}"
+                      ${answers[q.id] === String(val) ? 'checked' : ''} />
+                    <span>${val}</span>
+                  </label>
+                `).join('')}
+              </div>
+              <span class="likert-bound">${content.labels.right}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="action-row">
+        <button class="button primary" data-action="finish-attitude-survey" type="button" ${allAnswered ? '' : 'disabled'}>
+          ${content.nextButton}
+        </button>
+      </div>
     </section>
   `;
 }
