@@ -43,7 +43,7 @@ const wdlQuestions = [
     id: 'wdl1',
     difficulty: 'wdl',
     prompt:
-      'Two after-school tutoring programs were evaluated based on the number of students who improved their grades. Under Program A, 6 out of 10 students improved their grades. Under Program B, 8 out of 10 students improved their grades. Which conclusion is best supported by the data?',
+      'Two after-school tutoring programs were evaluated based on the number of students who improved their grades.\n\nUnder <strong>Program A</strong>, 6 out of 10 students improved their grades.\nUnder <strong>Program B</strong>, 8 out of 10 students improved their grades.\n\nWhich conclusion is best supported by the data?',
     options: [
       { id: 'A', text: 'Program B led to greater grade improvement than Program A', rationale: "focused on how Program B's results compared to Program A's" },
       { id: 'B', text: 'Program A led to greater grade improvement than Program B', rationale: "focused on how Program A's results compared to Program B's" },
@@ -55,7 +55,7 @@ const wdlQuestions = [
     id: 'wdl2',
     difficulty: 'wdl',
     prompt:
-      'A school reviewed test scores from four classrooms to decide where to focus additional academic support. The percentage of students who passed the end-of-term test in each classroom was as follows: Classroom A: 80%, Classroom B: 75%, Classroom C: 40%, Classroom D: 70%. Which classroom most needs additional academic support?',
+      'A school reviewed test scores from four classrooms to decide where to focus additional academic support. The percentage of students who passed the end-of-term test in each classroom was as follows:\n\n<strong>Classroom A:</strong> 80%\n<strong>Classroom B:</strong> 75%\n<strong>Classroom C:</strong> 40%\n<strong>Classroom D:</strong> 70%\n\nWhich classroom most needs additional academic support?',
     options: [
       { id: 'A', text: 'Classroom A', rationale: "focused on Classroom A's performance and how it compared to the others" },
       { id: 'B', text: 'Classroom B', rationale: "focused on Classroom B's performance and how it compared to the others" },
@@ -67,7 +67,7 @@ const wdlQuestions = [
     id: 'wdl3',
     difficulty: 'wdl',
     prompt:
-      'A teacher reviewed the average scores of four student groups: Group A: 78, Group B: 85, Group C: 82, Group D: 90. Which group performed the best overall?',
+      'A teacher reviewed the average scores of four student groups:\n\n<strong>Group A:</strong> 78\n<strong>Group B:</strong> 85\n<strong>Group C:</strong> 82\n<strong>Group D:</strong> 90\n\nWhich group performed the best overall?',
     options: [
       { id: 'A', text: 'Group A', rationale: "looked at Group A's score and weighed it against the others" },
       { id: 'B', text: 'Group B', rationale: "looked at Group B's score and weighed it against the others" },
@@ -79,7 +79,7 @@ const wdlQuestions = [
     id: 'wdl4',
     difficulty: 'wdl',
     prompt:
-      'A school considers a program successful if at least 80% of students improve.\nProgram A: 78% of students improved\nProgram B: 83% of students improved\nWhich program meets the success criterion?',
+      'A school considers a program successful if at least 80% of students improve.\n\n<strong>Program A:</strong> 78% of students improved\n<strong>Program B:</strong> 83% of students improved\n\nWhich program meets the success criterion?',
     options: [
       { id: 'A', text: 'Program A only', rationale: "evaluated Program A against the success criterion and made your judgment" },
       { id: 'B', text: 'Program B only', rationale: "evaluated Program B against the success criterion and made your judgment" },
@@ -91,7 +91,7 @@ const wdlQuestions = [
     id: 'wdl5',
     difficulty: 'wdl',
     prompt:
-      'A school tracked attendance rates over three months: Month 1: 72%, Month 2: 68%, Month 3: 74%. Which conclusion is best supported by the data?',
+      'A school tracked attendance rates over three months:\n\n<strong>Month 1:</strong> 72%\n<strong>Month 2:</strong> 68%\n<strong>Month 3:</strong> 74%\n\nWhich conclusion is best supported by the data?',
     options: [
       { id: 'A', text: 'Attendance was highest in Month 3', rationale: "compared the attendance rates and identified Month 3 as standing out" },
       { id: 'B', text: 'Attendance was highest in Month 2', rationale: "compared the attendance rates and identified Month 2 as standing out" },
@@ -103,7 +103,7 @@ const wdlQuestions = [
     id: 'wdl6',
     difficulty: 'wdl',
     prompt:
-      'A teacher recorded the number of homework submissions per week: Week 1: 18, Week 2: 22, Week 3: 19, Week 4: 25. Which week had the most submissions?',
+      'A teacher recorded the number of homework submissions per week:\n\n<strong>Week 1:</strong> 18\n<strong>Week 2:</strong> 22\n<strong>Week 3:</strong> 19\n<strong>Week 4:</strong> 25\n\nWhich week had the most submissions?',
     options: [
       { id: 'A', text: 'Week 1', rationale: "looked at Week 1's submissions and compared it against the other weeks" },
       { id: 'B', text: 'Week 2', rationale: "looked at Week 2's submissions and compared it against the other weeks" },
@@ -121,7 +121,7 @@ const wdhQuestions = [
     id: 'wdh1',
     difficulty: 'wdh',
     prompt:
-      'Two tutoring programs were evaluated:\nProgram A: 18 out of 24 students improved, and the average improvement was 12 points\nProgram B: 20 out of 40 students improved, and the average improvement was 15 points\nA teacher wants to compare which program had a higher improvement rate. Which program should the teacher choose based on this criterion?',
+      'Two tutoring programs were evaluated:\n\n<strong>Program A:</strong> 18 out of 24 students improved, and the average improvement was 12 points\n<strong>Program B:</strong> 20 out of 40 students improved, and the average improvement was 15 points\n\nA teacher wants to compare which program had a higher improvement rate. Which program should the teacher choose based on this criterion?',
     options: [
       { id: 'A', text: 'Program A', rationale: "focused on the proportion of students who improved in Program A" },
       { id: 'B', text: 'Program B', rationale: "focused on the proportion of students who improved in Program B" },
@@ -133,7 +133,7 @@ const wdhQuestions = [
     id: 'wdh2',
     difficulty: 'wdh',
     prompt:
-      'A school reviewed pass rates across six classrooms:\nClass A: 82%\nClass B: 79%\nClass C: 77%\nClass D: 74%\nClass E: 76%\nClass F: 58%\nThe school announces that a class needs urgent support if its pass rate is more than 20 percentage points lower than the highest-performing class. Which class meets this criterion?',
+      'A school reviewed pass rates across six classrooms:\n\n<strong>Class A:</strong> 82%\n<strong>Class B:</strong> 79%\n<strong>Class C:</strong> 77%\n<strong>Class D:</strong> 74%\n<strong>Class E:</strong> 76%\n<strong>Class F:</strong> 58%\n\nThe school announces that a class needs urgent support if its pass rate is more than 20 percentage points lower than the highest-performing class.\nWhich class meets this criterion?',
     options: [
       { id: 'A', text: 'Class C', rationale: "identified Class C's performance and evaluated it against the given condition" },
       { id: 'B', text: 'Class D', rationale: "identified Class D's performance and evaluated it against the given condition" },
@@ -145,7 +145,7 @@ const wdhQuestions = [
     id: 'wdh3',
     difficulty: 'wdh',
     prompt:
-      'Four student groups were evaluated:\nGroup A: 82 Avg Score, +5 Improvement\nGroup B: 85 Avg Score, +2 Improvement\nGroup C: 83 Avg Score, +7 Improvement\nGroup D: 84 Avg Score, +4 Improvement\nThe school defines “best overall performance” as: the highest average score, but only among groups with improvement of at least 4 points.\nWhich group should be selected?',
+      'Four student groups were evaluated:\n\n<strong>Group A:</strong> 82 Avg Score, +5 Improvement\n<strong>Group B:</strong> 85 Avg Score, +2 Improvement\n<strong>Group C:</strong> 83 Avg Score, +7 Improvement\n<strong>Group D:</strong> 84 Avg Score, +4 Improvement\n\nThe school defines “best overall performance” as: the highest average score, but only among groups with improvement of at least 4 points.\nWhich group should be selected?',
     options: [
       { id: 'A', text: 'Group A', rationale: "evaluated Group A against the given conditions and reached your conclusion" },
       { id: 'B', text: 'Group B', rationale: "evaluated Group B against the given conditions and reached your conclusion" },
@@ -157,7 +157,7 @@ const wdhQuestions = [
     id: 'wdh4',
     difficulty: 'wdh',
     prompt:
-      'A program is considered successful if: pass rate ≥ 80% and improvement ≥ 10%.\nHowever, the school adds: If a program has a pass rate below 80%, it cannot be considered successful, regardless of improvement.\nProgram A: 82% pass, +9% improvement\nProgram B: 79% pass, +11% improvement\nWhich program meets the success criterion?',
+      'A program is considered successful if: pass rate ≥ 80% and improvement ≥ 10%.\nHowever, the school adds: If a program has a pass rate below 80%, it cannot be considered successful, regardless of improvement.\n\n<strong>Program A:</strong> 82% pass, +9% improvement\n<strong>Program B:</strong> 79% pass, +11% improvement\n\nWhich program meets the success criterion?',
     options: [
       { id: 'A', text: 'Program A only', rationale: "checked Program A against the success conditions and made your judgment" },
       { id: 'B', text: 'Program B only', rationale: "checked Program B against the success conditions and made your judgment" },
@@ -169,7 +169,7 @@ const wdhQuestions = [
     id: 'wdh5',
     difficulty: 'wdh',
     prompt:
-      'A student\'s performance was evaluated before and after joining a program:\nBefore: 70, 74\nAfter: 78, 80\nThe teacher specifies: "Improvement is only meaningful if the average score increases by at least 8 points."\nBased on this criterion, which conclusion is best supported?',
+      'A student\'s performance was evaluated before and after joining a program:\n\n<strong>Before:</strong> 70, 74\n<strong>After:</strong> 78, 80\n\nThe teacher specifies: "Improvement is only meaningful if the average score increases by at least 8 points."\nBased on this criterion, which conclusion is best supported?',
     options: [
       { id: 'A', text: 'The student showed meaningful improvement', rationale: "looked at the scores before and after the program and assessed the change" },
       { id: 'B', text: 'The student improved, but not enough to meet the criterion', rationale: "looked at the scores before and after the program and assessed the change against the criterion" },
@@ -181,7 +181,7 @@ const wdhQuestions = [
     id: 'wdh6',
     difficulty: 'wdh',
     prompt:
-      'A reading program was introduced, and student performance was measured:\nBefore: 60%, 62%, 61%\nAfter: 68%, 64%, 70%\nThe school defines improvement as: “A consistent increase across all measurements.” Based on this definition, which conclusion is best supported?',
+      'A reading program was introduced, and student performance was measured:\n\n<strong>Before:</strong> 60%, 62%, 61%\n<strong>After:</strong> 68%, 64%, 70%\n\nThe school defines improvement as: “A consistent increase across all measurements.”\nBased on this definition, which conclusion is best supported?',
     options: [
       { id: 'A', text: 'Performance improved', rationale: "checked each measurement against the definition of consistent improvement and reached your conclusion" },
       { id: 'B', text: 'No consistent improvement is observed', rationale: "examined the pattern across measurements and questioned whether it met the definition" },
@@ -199,7 +199,7 @@ const idlQuestions = [
     id: 'idl1',
     difficulty: 'idl',
     prompt:
-      'A student is preparing for an important exam and is deciding how to study.\nOption A: Review notes repeatedly to strengthen memory\nOption B: Practice solving new problems to improve understanding\nWhich approach would you recommend for this situation?',
+      'A student is preparing for an important exam and is deciding how to study.\n\n<strong>Option A:</strong> Review notes repeatedly to strengthen memory\n<strong>Option B:</strong> Practice solving new problems to improve understanding\n\nWhich approach would you recommend for this situation?',
     options: [
       { id: 'A', text: 'Option A', rationale: "considered how reinforcing existing knowledge could help the student prepare" },
       { id: 'B', text: 'Option B', rationale: "considered how building new problem-solving skills could help the student prepare" },
@@ -211,7 +211,7 @@ const idlQuestions = [
     id: 'idl2',
     difficulty: 'idl',
     prompt:
-      'A teacher is deciding how to handle late assignments.\nOption A: Deduct points to encourage discipline\nOption B: Accept all submissions to support learning\nWhich approach would you recommend?',
+      'A teacher is deciding how to handle late assignments.\n\n<strong>Option A:</strong> Deduct points to encourage discipline\n<strong>Option B:</strong> Accept all submissions to support learning\n\nWhich approach would you recommend?',
     options: [
       { id: 'A', text: 'Option A', rationale: "considered how maintaining consistent consequences could benefit the classroom" },
       { id: 'B', text: 'Option B', rationale: "considered how prioritizing student learning could be more supportive in the long run" },
@@ -223,7 +223,7 @@ const idlQuestions = [
     id: 'idl3',
     difficulty: 'idl',
     prompt:
-      'A student is choosing how to complete a group project.\nOption A: Work individually to ensure quality\nOption B: Collaborate closely with teammates\nWhich approach would you recommend?',
+      'A student is choosing how to complete a group project.\n\n<strong>Option A:</strong> Work individually to ensure quality\n<strong>Option B:</strong> Collaborate closely with teammates\n\nWhich approach would you recommend?',
     options: [
       { id: 'A', text: 'Option A', rationale: "thought about how working independently could help maintain control over the outcome" },
       { id: 'B', text: 'Option B', rationale: "thought about how collaborating could bring in different perspectives and improve the result" },
@@ -235,7 +235,7 @@ const idlQuestions = [
     id: 'idl4',
     difficulty: 'idl',
     prompt:
-      'A student is unsure whether to take a course they are interested in but have little background in.\nOption A: Take the course and learn along the way\nOption B: Choose a course they are already familiar with\nWhich would you recommend?',
+      'A student is unsure whether to take a course they are interested in but have little background in.\n\n<strong>Option A:</strong> Take the course and learn along the way\n<strong>Option B:</strong> Choose a course they are already familiar with\n\nWhich would you recommend?',
     options: [
       { id: 'A', text: 'Option A', rationale: "considered how taking on something new could be a valuable opportunity for the student" },
       { id: 'B', text: 'Option B', rationale: "considered how choosing a familiar subject could make the experience more manageable" },
@@ -247,7 +247,7 @@ const idlQuestions = [
     id: 'idl5',
     difficulty: 'idl',
     prompt:
-      'A teacher is evaluating a student\'s overall performance.\nThe student participates actively in class discussions, but their test scores are slightly below the class average.\nHow should the teacher evaluate this student overall?',
+      'A teacher is evaluating a student\'s overall performance. The student participates actively in class discussions, but their test scores are slightly below the class average.\n\nHow should the teacher evaluate this student overall?',
     options: [
       { id: 'A', text: 'Positive overall', rationale: "weighed the student's participation as a meaningful indicator of their overall performance" },
       { id: 'B', text: 'Negative overall', rationale: "weighed the student's test scores as a meaningful indicator of their overall performance" },
@@ -259,7 +259,7 @@ const idlQuestions = [
     id: 'idl6',
     difficulty: 'idl',
     prompt:
-      'A school is deciding whether to introduce a new teaching method.\nThe new method has shown promising results elsewhere, but teachers at the school are unfamiliar with it and would need time to adjust.\nWhich approach would you recommend?',
+      'A school is deciding whether to introduce a new teaching method. The new method has shown promising results elsewhere, but teachers at the school are unfamiliar with it and would need time to adjust.\n\nWhich approach would you recommend?',
     options: [
       { id: 'A', text: 'Introduce the new method — potential benefits outweigh the transition challenges', rationale: "considered how the potential benefits of the new method could outweigh the challenges of transitioning" },
       { id: 'B', text: 'Keep the current method — familiarity and stability matter more', rationale: "considered how maintaining familiarity and stability could be more beneficial for the school" },
@@ -277,7 +277,7 @@ const idhQuestions = [
     id: 'idh1',
     difficulty: 'idh',
     prompt:
-      'A student is preparing for final exams with limited time. They are considering how to allocate their effort:\nOption A: Focus on subjects they are already good at to maximize their overall GPA\nOption B: Focus on subjects they are struggling with to avoid failing\nThe student cannot realistically do both equally well.\nWhich approach would you recommend?',
+      'A student is preparing for final exams with limited time. They are considering how to allocate their effort:\n\n<strong>Option A:</strong> Focus on subjects they are already good at to maximize their overall GPA\n<strong>Option B:</strong> Focus on subjects they are struggling with to avoid failing\n\nThe student cannot realistically do both equally well. Which approach would you recommend?',
     options: [
       { id: 'A', text: 'Option A', rationale: "considered how focusing on stronger subjects could help the student maximize their overall performance" },
       { id: 'B', text: 'Option B', rationale: "considered how addressing weaker subjects could help the student avoid more serious consequences" },
@@ -289,7 +289,7 @@ const idhQuestions = [
     id: 'idh2',
     difficulty: 'idh',
     prompt:
-      'A teacher is deciding how to handle late assignments:\nSome students submitted work late due to personal difficulties\nOthers submitted on time despite similar challenges\nThe teacher is choosing between:\nOption A: Apply strict penalties equally to all late submissions\nOption B: Be flexible and consider individual circumstances\nWhich approach would you recommend?',
+      'A teacher is deciding how to handle late assignments. Some students submitted work late due to personal difficulties. Others submitted on time despite similar challenges.\nThe teacher is choosing between:\n\n<strong>Option A:</strong> Apply strict penalties equally to all late submissions\n<strong>Option B:</strong> Be flexible and consider individual circumstances\n\nWhich approach would you recommend?',
     options: [
       { id: 'A', text: 'Option A', rationale: "considered how applying consistent rules could help maintain fairness across all students" },
       { id: 'B', text: 'Option B', rationale: "considered how accounting for individual circumstances could better support students facing difficulties" },
@@ -301,7 +301,7 @@ const idhQuestions = [
     id: 'idh3',
     difficulty: 'idh',
     prompt:
-      'A teacher is deciding how to structure an upcoming important exam.\nThe exam results will be used to determine student placements for next year.\nTeachers are divided on which format better reflects student ability.\nOption A: Use open-ended questions — allows students to demonstrate deeper understanding but is harder to grade fairly\nOption B: Use multiple choice questions — easier to grade consistently but may not capture full understanding\nWhich approach would you recommend?',
+      'A teacher is deciding how to structure an upcoming important exam. The exam results will be used to determine student placements for next year.\nTeachers are divided on which format better reflects student ability.\n\n<strong>Option A:</strong> Use open-ended questions — allows students to demonstrate deeper understanding but is harder to grade fairly\n<strong>Option B:</strong> Use multiple choice questions — easier to grade consistently but may not capture full understanding\n\nWhich approach would you recommend?',
     options: [
       { id: 'A', text: 'Option A — open-ended questions', rationale: "considered how open-ended questions could give students a better opportunity to show their understanding" },
       { id: 'B', text: 'Option B — multiple choice questions', rationale: "considered how multiple choice questions could make the grading process more consistent and fair" },
@@ -313,7 +313,7 @@ const idhQuestions = [
     id: 'idh4',
     difficulty: 'idh',
     prompt:
-      'A school is deciding how to allocate limited funding:\nOption A: Invest in high-performing students to help them achieve top results\nOption B: Invest in struggling students to help them catch up\nTeachers are divided, and both options cannot be fully funded.\nWhich approach would you recommend?',
+      'A school is deciding how to allocate limited funding:\n\n<strong>Option A:</strong> Invest in high-performing students to help them achieve top results\n<strong>Option B:</strong> Invest in struggling students to help them catch up\nTeachers are divided, and both options cannot be fully funded.\n\nWhich approach would you recommend?',
     options: [
       { id: 'A', text: 'Option A', rationale: "considered how investing in high-performing students could help the school maximize its overall achievements" },
       { id: 'B', text: 'Option B', rationale: "considered how supporting struggling students could help reduce gaps and promote fairness" },
@@ -325,7 +325,7 @@ const idhQuestions = [
     id: 'idh5',
     difficulty: 'idh',
     prompt:
-      'A student is choosing between two internship opportunities:\nOption A: A well-known company that offers prestige but limited hands-on experience\nOption B: A smaller company that offers more practical experience but less recognition\nThe student can only choose one.\nWhich option would you recommend?',
+      'A student is choosing between two internship opportunities:\n\n<strong>Option A:</strong> A well-known company that offers prestige but limited hands-on experience\n<strong>Option B:</strong> A smaller company that offers more practical experience but less recognition\n\nThe student can only choose one. Which option would you recommend?',
     options: [
       { id: 'A', text: 'Option A', rationale: "considered how the recognition from a well-known company could open doors for the student in the future" },
       { id: 'B', text: 'Option B', rationale: "considered how gaining practical experience could help the student build real-world skills more effectively" },
@@ -337,7 +337,7 @@ const idhQuestions = [
     id: 'idh6',
     difficulty: 'idh',
     prompt:
-      'A school counselor is advising a student who has been offered a place in an advanced class.\nThe student is capable but has been struggling with stress and burnout recently.\nWhich approach would you recommend?',
+      'A school counselor is advising a student who has been offered a place in an advanced class. The student is capable but has been struggling with stress and burnout recently.\n\nWhich approach would you recommend?',
     options: [
       { id: 'A', text: 'Accept the placement — the long-term academic benefits outweigh the short-term stress', rationale: "considered how the long-term academic benefits could outweigh the challenges the student is currently facing" },
       { id: 'B', text: 'Decline the placement — the student\'s well-being should come first', rationale: "considered how prioritizing the student's well-being could be more important than the academic opportunity right now" },
@@ -533,7 +533,7 @@ export const experimentContent = {
   },
   quiz: {
     helper:
-      'Choose only one answer for each question. Afterwards, please press "Ask KAI" before moving to the next question.',
+      'Choose only one answer for each question.',
     checkButton: 'Ask KAI',
     nextButton: 'Next question',
     finalButton: 'Final survey',

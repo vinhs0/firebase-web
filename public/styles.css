@@ -341,7 +341,7 @@ body::before {
 
 .question-prompt {
   white-space: pre-line;
-  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  font-size: 1rem;
   line-height: 1.45;
   margin: 0;
 }
