@@ -459,7 +459,7 @@ function handleChange(event) {
   if (event.target.dataset.action === 'select-attitude') {
     state.attitudeSurvey.answers[event.target.dataset.questionId] = event.target.value;
     persistState();
-    renderStageAndFocus(false); // Re-render to unlock the continue button if all answered
+    render(); // Re-render to unlock the continue button if all answered
   }
 }
 
@@ -490,7 +490,7 @@ function selectOption(optionId) {
 
   recordEvent('answer_selected', { questionId: question.id, optionId });
   persistState();
-  renderStageAndFocus(false);
+  render();
   void syncParticipantState();
 }
 
