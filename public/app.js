@@ -625,17 +625,13 @@ function renderConsent() {
         <div class="accordion-container">
           <details>
             <summary><strong>What you will do</strong></summary>
-            <p class="summary-copy">You will complete a series of short reasoning and decision-making tasks. For each task, you will first select an answer based on your own judgment, and then view a response from an AI system. After completing the tasks, you will be directed to a short questionnaire on a separate page. Please make sure to complete both parts for your responses to be recorded. We kindly ask you to respond as carefully and sincerely as possible.</p>
+            <p class="summary-copy">You will complete a series of short reasoning and decision-making tasks. For each task, you will first select an answer based on your own judgment, and then view a response from an AI system. After completing the tasks, you will be directed to a short questionnaire. Please make sure to complete both parts for your responses to be recorded.</p>
+            <p class="summary-copy">We kindly ask you to respond as carefully and sincerely as possible.</p>
           </details>
 
           <details>
             <summary><strong>Time required</strong></summary>
-            <p class="summary-copy">The study will take approximately 10~15 minutes.</p>
-          </details>
-
-          <details>
-            <summary><strong>Voluntary participation</strong></summary>
-            <p class="summary-copy">Your participation is entirely voluntary. You may stop participating at any time without any disadvantage or penalty.</p>
+            <p class="summary-copy">The study will take approximately <strong>10~15 minutes.</strong></p>
           </details>
 
           <details>
@@ -644,8 +640,10 @@ function renderConsent() {
           </details>
 
           <details>
-            <summary><strong>Risks and discomfort</strong></summary>
-            <p class="summary-copy">There are no known risks beyond those encountered in everyday activities. You may skip any question you do not wish to answer.</p>
+            <summary><strong>Voluntary participation and Risks and discomfort</strong></summary>
+            <p class="summary-copy">There are no known risks beyond those encountered in everyday activities.</p>
+            <p class="summary-copy">Participation is voluntary. You may stop participating at any time without disadvantage or penalty.</p>
+            <p class="summary-copy">Please note that some questions require a response in order to proceed through the study.</p>
           </details>
 
           <details>
@@ -824,7 +822,6 @@ function renderSurvey() {
   return `
     <section class="surface survey-card">
       <div class="section-heading">
-        <p class="section-kicker">Final survey</p>
         <h2>${experimentContent.survey.title}</h2>
       </div>
       <p class="survey-copy">${experimentContent.survey.copy}</p>
