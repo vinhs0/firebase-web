@@ -783,7 +783,7 @@ function renderQuestion() {
           <div>
             <h2>${
               question.id
-                ? question.id[0].toUpperCase() +
+                ? 'Question ' +
                   (question.id.length > 1 ? question.id[question.id.length - 1].toUpperCase() : '')
                 : ''
             }</h2>

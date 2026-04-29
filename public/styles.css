@@ -423,11 +423,13 @@ body::before {
 .option-card {
   width: 100%;
   text-align: left;
-  padding: 18px 18px 18px 74px;
+  padding: 18px 24px; 
   border-radius: 20px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.76);
-  position: relative;
+  display: flex;
+  align-items: center; 
+  gap: 16px; 
   cursor: pointer;
   transition:
     border-color 120ms ease,
@@ -452,9 +454,7 @@ body::before {
 }
 
 .option-badge {
-  position: absolute;
-  left: 18px;
-  top: 18px;
+  flex-shrink: 0;
   width: 40px;
   height: 40px;
   border-radius: 14px;
@@ -466,8 +466,10 @@ body::before {
 }
 
 .option-text {
+  flex: 1;
   font-size: 1rem;
-  line-height: 1.55;
+  line-height: 1.4;
+  margin: 0;
 }
 
 .chat-card {
