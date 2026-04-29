@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -28,7 +28,7 @@
             <h2>Log in</h2>
           </div>
           <p class="muted">
-            This is only for Researchers of this experiment. If you are not a researcher of this experiment, please click on "Back to experiment"
+            This is only for the researchers of this experiment. If you are not a researcher of this experiment, please click on "Back to experiment".
           </p>
           <form id="admin-login-form" class="stack">
             <label class="field">
@@ -52,11 +52,11 @@
         <section class="surface admin-dashboard hidden" id="admin-dashboard">
           <div class="admin-toolbar">
             <div class="section-heading">
-              <h2>Dữ liệu participant</h2>
+              <h2>Participants' data</h2>
             </div>
             <div class="toolbar-actions">
               <button class="button ghost" id="refresh-admin" type="button">Refresh</button>
-              <button class="button ghost" id="signout-admin" type="button">Đăng xuất</button>
+              <button class="button ghost" id="signout-admin" type="button">Log out</button>
             </div>
           </div>
 
@@ -64,13 +64,7 @@
 
           <div class="toolbar-actions export-actions">
             <button class="button secondary" id="export-summary" type="button">
-              Tải summary CSV
-            </button>
-            <button class="button secondary" id="export-events" type="button">
-              Tải events CSV
-            </button>
-            <button class="button secondary" id="export-json" type="button">
-              Tải JSON bundle
+              Download CSV
             </button>
           </div>
 
@@ -82,6 +76,7 @@
                   <th>Condition</th>
                   <th>Difficulty</th>
                   <th>Stage</th>
+                  <th>AI Checks</th>
                   <th>Updated</th>
                 </tr>
               </thead>
