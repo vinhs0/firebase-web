@@ -34,6 +34,7 @@ appTitle.textContent = runtimeConfig.appName;
 
 let state = normalizeState(loadState());
 let syncInFlight = false;
+let surveyTimer = null;
 
 appRoot.addEventListener('click', handleClick);
 appRoot.addEventListener('change', handleChange);
@@ -427,8 +428,14 @@ function handleClick(event) {
   if (action === 'open-survey') {
     if (runtimeConfig.survey.fallbackUrl) {
       window.open(runtimeConfig.survey.fallbackUrl, '_blank', 'noopener,noreferrer');
-      recordEvent('survey_opened_external');
-      persistState();
+
+      if (!state.survey.openedAt) {
+        state.survey.openedAt = Date.now();
+        recordEvent('survey_opened_external');
+        persistState();
+      }
+      
+      renderStageAndFocus(false);
       void syncParticipantState();
     }
     return;
@@ -622,6 +629,7 @@ function render() {
 
   if (state.currentStage === 'survey') {
     appRoot.insertAdjacentHTML('beforeend', renderSurvey());
+    startSurveyTimer();
     return;
   }
 
@@ -887,9 +895,45 @@ function renderQuestion() {
   `;
 }
 
+function startSurveyTimer() {
+  const REQUIRED_WAIT_MS = 60000; // 60 seconds
+  if (surveyTimer) clearInterval(surveyTimer);
+  
+  surveyTimer = setInterval(() => {
+    const btn = document.getElementById('survey-confirm-btn');
+    
+    if (!btn || state.currentStage !== 'survey') {
+      clearInterval(surveyTimer);
+      return;
+    }
+    
+    const elapsed = Date.now() - state.survey.startedAt;
+    const remainingSec = Math.ceil(Math.max(0, REQUIRED_WAIT_MS - elapsed) / 1000);
+    
+    if (remainingSec > 0) {
+      btn.textContent = `Please wait (${remainingSec}s)`;
+      btn.disabled = true;
+      btn.removeAttribute('data-action'); // Prevent accidental clicks
+    } else {
+      clearInterval(surveyTimer); // Stop ticking
+      btn.textContent = experimentContent.survey.confirmButton;
+      btn.disabled = false;
+      btn.setAttribute('data-action', 'acknowledge-survey'); // Unlock the button
+    }
+  }, 1000);
+}
+
 function renderSurvey() {
   const hasEmbed = Boolean(runtimeConfig.survey.embedUrl);
   const hasFallback = Boolean(runtimeConfig.survey.fallbackUrl);
+
+  const REQUIRED_WAIT_MS = 60000; // 60 seconds
+  let remainingSec = 0;
+  
+  if (state.survey.startedAt) {
+    const elapsed = Date.now() - state.survey.startedAt;
+    remainingSec = Math.ceil(Math.max(0, REQUIRED_WAIT_MS - elapsed) / 1000);
+  }
 
   return `
     <section class="surface survey-card">
@@ -916,8 +960,13 @@ function renderSurvey() {
             `
             : ''
         }
-        <button class="button primary" data-action="acknowledge-survey" type="button">
-          ${experimentContent.survey.confirmButton}
+        <button 
+          id="survey-confirm-btn"
+          class="button primary" 
+          ${remainingSec > 0 ? 'disabled' : 'data-action="acknowledge-survey"'} 
+          type="button"
+        >
+          ${remainingSec > 0 ? `Please complete the survey` : experimentContent.survey.confirmButton}
         </button>
       </div>
     </section>
