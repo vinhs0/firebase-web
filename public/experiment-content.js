@@ -533,8 +533,8 @@ export const experimentContent = {
   },
   quiz: {
     helper:
-      'Choose only one answer for each question. Afterwards, please press "Ask Psych AI" before moving to the next question.',
-    checkButton: 'Ask Psych AI',
+      'Choose only one answer for each question. Afterwards, please press "Ask KAI" before moving to the next question.',
+    checkButton: 'Ask KAI',
     nextButton: 'Next question',
     finalButton: 'Final survey',
   },

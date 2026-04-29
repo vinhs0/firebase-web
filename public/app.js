@@ -847,15 +847,15 @@ function renderQuestion() {
 
       <aside class="surface chat-card">
         <div class="section-heading">
-          <h2>Psych AI</h2>
+          <h2>KAI</h2>
         </div>
         <div class="chat-thread">
           ${
             state.currentQuestionIndex === 0
-              ? '<div class="chat-bubble ai">Hi, I am Psych AI, a chatbot designed for human psychology studies. Let\'s start the conversation!</div>'
+              ? '<div class="chat-bubble ai">Hi, I\'m KAI. I\'ll provide brief feedback after each task.</div>'
               : ''
           }
-          <div class="chat-bubble ai">What is your choice for this question?</div>
+          <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing. Take a moment to review the question and choose the option that best fits your judgment.</div>
           ${
             answerState.selectedOptionId
               ? `
@@ -865,13 +865,13 @@ function renderQuestion() {
                   }
                 </div>
               `
-              : '<div class="chat-bubble system">Select an answer to start the conversation.</div>'
+              : '<div class="chat-bubble system">Take a moment to review the question and choose the option that best fits your judgment.</div>'
           }
           ${
             answerState.aiChecked
               ? aiMessages.map((message) => `<div class="chat-bubble ${message.role}">${message.text}</div>`).join('')
               : answerState.selectedOptionId
-                ? '<div class="chat-bubble system">Press "Ask Psych AI" to check your answer with Psych AI.</div>'
+                ? '<div class="chat-bubble system">Press "Ask KAI" to check your answer with KAI.</div>'
                 : ''
           }
         </div>
