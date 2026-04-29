@@ -941,6 +941,7 @@ function renderSurvey() {
         <h2>${experimentContent.survey.title}</h2>
       </div>
       <p class="survey-copy">${experimentContent.survey.copy}</p>
+      <div class="participant-code">Your ID: ${state.participantId}</div>
       ${
         hasEmbed
           ? `<iframe class="survey-frame" src="${runtimeConfig.survey.embedUrl}" title="Final survey"></iframe>`
