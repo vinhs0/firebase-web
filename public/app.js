@@ -294,7 +294,7 @@ async function syncParticipantState() {
   }
 
   syncInFlight = true;
-  setSyncStatus('syncing', 'Syncing...');
+  setSyncStatus('syncing', '');
 
   try {
     const user = await ensureParticipantAuth();
