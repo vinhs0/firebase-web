@@ -294,17 +294,17 @@ async function syncParticipantState() {
   }
 
   syncInFlight = true;
-  setSyncStatus('syncing', 'Đang đồng bộ dữ liệu');
+  setSyncStatus('syncing', 'Syncing...');
 
   try {
     const user = await ensureParticipantAuth();
 
     if (!user) {
-      throw new Error('Không nhận được Firebase session.');
+      throw new Error('Cannot receive Firebase session.');
     }
 
     if (state.ownerUid && state.ownerUid !== user.uid) {
-      throw new Error('Firebase session đã thay đổi. Dữ liệu sẽ tiếp tục được giữ local.');
+      throw new Error('Firebase session has changed. Data will be stored locally.');
     }
 
     if (!state.ownerUid) {
