@@ -541,7 +541,7 @@ export const experimentContent = {
   survey: {
     title: 'Final survey',
     copy:
-      'If you have a Google Form or an external survey, add the embed or fallback link in the config. When the participant is done, they can confirm completion here.',
+      'Before finishing the experiment, you need to complete a Google form. To fill in the Google form, you need to copy your ID into the form.',
     confirmButton: 'I completed the survey',
     openFallbackButton: 'Open survey in a new tab',
   },

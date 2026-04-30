@@ -453,6 +453,25 @@ function handleClick(event) {
     renderStageAndFocus();
     void syncParticipantState();
   }
+
+  if (action === 'copy-id') {
+    navigator.clipboard.writeText(state.participantId).then(() => {
+      const originalContent = actionElement.innerHTML;
+
+      actionElement.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      `;
+      
+      setTimeout(() => {
+        actionElement.innerHTML = originalContent;
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+    return;
+  }
 }
 
 function handleChange(event) {
@@ -911,7 +930,7 @@ function startSurveyTimer() {
     const remainingSec = Math.ceil(Math.max(0, REQUIRED_WAIT_MS - elapsed) / 1000);
     
     if (remainingSec > 0) {
-      btn.textContent = `Please wait (${remainingSec}s)`;
+      btn.textContent = `Please complete the survey`;
       btn.disabled = true;
       btn.removeAttribute('data-action'); // Prevent accidental clicks
     } else {
@@ -941,7 +960,15 @@ function renderSurvey() {
         <h2>${experimentContent.survey.title}</h2>
       </div>
       <p class="survey-copy">${experimentContent.survey.copy}</p>
-      <div class="participant-code">Your ID: ${state.participantId}</div>
+      <div class="participant-code">
+        <span>Your ID: <strong>${state.participantId}</strong></span>
+        <button class="button secondary" data-action="copy-id" type="button" style="padding: 6px 12px; display: flex; align-items: center; gap: 6px; min-height: 32px;" title="Copy ID">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
       ${
         hasEmbed
           ? `<iframe class="survey-frame" src="${runtimeConfig.survey.embedUrl}" title="Final survey"></iframe>`
@@ -952,15 +979,6 @@ function renderSurvey() {
           `
       }
       <div class="action-row">
-        ${
-          hasFallback
-            ? `
-              <button class="button ghost" data-action="open-survey" type="button">
-                ${experimentContent.survey.openFallbackButton}
-              </button>
-            `
-            : ''
-        }
         <button 
           id="survey-confirm-btn"
           class="button primary" 
