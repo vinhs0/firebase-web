@@ -828,7 +828,7 @@ function renderQuestion() {
   // --- INTRO LOGIC (Runs when question loads) ---
   const isFirstQuestion = state.currentQuestionIndex === 0;
   const typingDelay = 1500; 
-  const systemDelay = 1000; 
+  const systemDelay = 500; 
   const introFinalPhase = isFirstQuestion ? 3 : 2; 
   let introPhase = 0; 
 
@@ -924,7 +924,10 @@ function renderQuestion() {
                 optionClasses.push('selected');
               }
 
-              if (answerState.completedAt || answerState.aiChecked) {
+              // --- NEW LOGIC: Locks buttons during intro, or immediately after Ask KAI is pressed ---
+              const isLocked = !isIntroComplete || answerState.aiLoading || answerState.aiChecked || answerState.completedAt;
+
+              if (isLocked) {
                 optionClasses.push('locked');
               }
 
@@ -934,7 +937,7 @@ function renderQuestion() {
                   data-action="select-option"
                   data-option-id="${option.id}"
                   type="button"
-                  ${answerState.completedAt || answerState.aiChecked ? 'disabled' : ''}
+                  ${isLocked ? 'disabled' : ''}
                 >
                   <span class="option-badge">${option.id}</span>
                   <span class="option-text">${option.text}</span>
@@ -1026,7 +1029,7 @@ function renderQuestion() {
                         <div class="typing-dots"><span></span><span></span><span></span></div>
                       </div>
                     `
-                    : `<div class="chat-bubble ai">Thanks. Here’s my feedback.</div>`
+                    : `<div class="chat-bubble ai">Thanks. Here\'s my feedback.</div>`
                 }
                 
                 ${
@@ -1049,7 +1052,7 @@ function renderQuestion() {
                           <div class="typing-dots"><span></span><span></span><span></span></div>
                         </div>
                       `
-                      : `<div class="chat-bubble ai">When you’re ready, please continue to the next task.</div>`
+                      : `<div class="chat-bubble ai">When you\'re ready, please continue to the next task.</div>`
                     : ''
                 }
               `
