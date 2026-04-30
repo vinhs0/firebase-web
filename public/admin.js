@@ -1,7 +1,6 @@
 import { runtimeConfig } from './firebase-config.js';
 import {
   fetchAllParticipants,
-  fetchParticipantEvents,
   isFirebaseEnabled,
   signInAdmin,
   signOutCurrentUser,
@@ -19,13 +18,14 @@ const tableBody = document.querySelector('#participants-table-body');
 const refreshButton = document.querySelector('#refresh-admin');
 const signoutButton = document.querySelector('#signout-admin');
 const exportSummaryButton = document.querySelector('#export-summary');
+
+// Grab the other buttons so we can hide them automatically
 const exportEventsButton = document.querySelector('#export-events');
 const exportJsonButton = document.querySelector('#export-json');
 
 emailField.placeholder = runtimeConfig.adminEmailHint;
 
 let participants = [];
-let cachedEvents = new Map();
 
 loginForm.addEventListener('submit', handleLogin);
 refreshButton.addEventListener('click', () => {
@@ -34,23 +34,20 @@ refreshButton.addEventListener('click', () => {
 signoutButton.addEventListener('click', async () => {
   await signOutCurrentUser();
   participants = [];
-  cachedEvents = new Map();
   renderMetrics();
   renderTable();
   dashboard.classList.add('hidden');
   authStatus.textContent = 'Logged out.';
 });
-exportSummaryButton.addEventListener('click', exportSummary);
-exportEventsButton.addEventListener('click', () => {
-  void exportEvents();
-});
-exportJsonButton.addEventListener('click', () => {
-  void exportJsonBundle();
-});
+
+exportSummaryButton?.addEventListener('click', exportSummary);
+
+// Hide the unused buttons from the UI without needing to edit admin.html
+if (exportEventsButton) exportEventsButton.style.display = 'none';
+if (exportJsonButton) exportJsonButton.style.display = 'none';
 
 if (!isFirebaseEnabled()) {
-  authStatus.textContent =
-    'Let enableFirebaseSync = true to use admin.';
+  authStatus.textContent = 'Let enableFirebaseSync = true to use admin.';
 }
 
 async function handleLogin(event) {
@@ -77,7 +74,6 @@ async function refreshDashboard() {
 
   try {
     participants = await fetchAllParticipants();
-    cachedEvents = new Map();
     renderMetrics();
     renderTable();
     authStatus.textContent = `Đã tải ${participants.length} participant.`;
@@ -133,33 +129,28 @@ function renderTable() {
 
 function buildSummaryRows() {
   return participants.map((entry) => {
+    // Calculate total time taken for the whole experiment in seconds
+    let totalTimeSec = '';
+    if (entry.completedAt && entry.consentedAt) {
+      totalTimeSec = ((entry.completedAt - entry.consentedAt) / 1000).toFixed(2);
+    }
+
+    // Set up the exact columns you requested
     const row = {
       participantId: entry.participantId,
-      conditionId: entry.conditionId,
-      difficultyLevel: entry.difficultyLevel,
-      currentStage: entry.currentStage,
-      actionCount: entry.actionCount,
-      aiCheckCount: entry.aiCheckCount,
-      createdAt: formatDateTime(entry.createdAt),
-      consentedAt: formatDateTime(entry.consentedAt),
-      completedAt: formatDateTime(entry.completedAt),
-      surveyAcknowledgedAt: formatDateTime(entry.surveyAcknowledgedAt),
+      difficultyLevel: entry.difficultyLevel ?? '',
+      total_time_taken_sec: totalTimeSec,
     };
 
-    row['att1_impression'] = entry.attitudeSurvey?.answers?.att1 ?? '';
-    row['att2_comfortable'] = entry.attitudeSurvey?.answers?.att2 ?? '';
-    row['att3_favorable'] = entry.attitudeSurvey?.answers?.att3 ?? '';
-    row['att4_interested'] = entry.attitudeSurvey?.answers?.att4 ?? '';
-    row['att5_exciting'] = entry.attitudeSurvey?.answers?.att5 ?? '';
-    row['att6_beneficial'] = entry.attitudeSurvey?.answers?.att6 ?? ''; 
-
+    // Iterate through all questions to get answers and duration
     experimentContent.questions.forEach((question) => {
       const answer = entry.answers?.[question.id] ?? {};
+      
       row[`${question.id}_answer`] = answer.selectedOptionId ?? '';
-      row[`${question.id}_ai_checked`] = answer.aiChecked ?? false;
-      row[`${question.id}_skipped_ai`] = answer.skippedAi ?? false;
-      row[`${question.id}_answer_duration_ms`] = answer.answerDurationMs ?? '';
-      row[`${question.id}_total_duration_ms`] = answer.totalDurationMs ?? '';
+      
+      row[`${question.id}_time_taken_sec`] = answer.totalDurationMs 
+        ? (answer.totalDurationMs / 1000).toFixed(2) 
+        : '';
     });
 
     return row;
@@ -169,57 +160,4 @@ function buildSummaryRows() {
 function exportSummary() {
   const csv = toCsv(buildSummaryRows());
   downloadFile('participant-summary.csv', csv, 'text/csv;charset=utf-8');
-}
-
-async function ensureEventsLoaded() {
-  await Promise.all(
-    participants.map(async (entry) => {
-      if (!cachedEvents.has(entry.participantId)) {
-        const events = await fetchParticipantEvents(entry.participantId);
-        cachedEvents.set(entry.participantId, events);
-      }
-    }),
-  );
-}
-
-async function exportEvents() {
-  authStatus.textContent = 'Đang tải event logs...';
-  await ensureEventsLoaded();
-
-  const rows = participants.flatMap((entry) => {
-    const events = cachedEvents.get(entry.participantId) ?? [];
-
-    return events.map((event) => ({
-      participantId: entry.participantId,
-      difficultyLevel: entry.difficultyLevel ?? '',
-      sequence: event.sequence,
-      type: event.type,
-      stage: event.stage,
-      timestamp: formatDateTime(event.timestamp),
-      questionId: event.questionId ?? '',
-      optionId: event.optionId ?? '',
-      skippedAi: event.skippedAi ?? '',
-      totalDurationMs: event.totalDurationMs ?? '',
-    }));
-  });
-
-  downloadFile('participant-events.csv', toCsv(rows), 'text/csv;charset=utf-8');
-  authStatus.textContent = 'Đã export event logs.';
-}
-
-async function exportJsonBundle() {
-  authStatus.textContent = 'Đang chuẩn bị JSON bundle...';
-  await ensureEventsLoaded();
-
-  const bundle = participants.map((entry) => ({
-    participant: entry,
-    events: cachedEvents.get(entry.participantId) ?? [],
-  }));
-
-  downloadFile(
-    'participant-bundle.json',
-    JSON.stringify(bundle, null, 2),
-    'application/json;charset=utf-8',
-  );
-  authStatus.textContent = 'Đã export JSON bundle.';
 }
