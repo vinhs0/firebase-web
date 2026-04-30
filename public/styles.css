@@ -763,11 +763,6 @@ code {
     flex-direction: column;
   }
 
-  .chat-action-row {
-    justify-content: flex-end; 
-    width: 100%;
-  }
-
   .button {
     width: 100%;
     justify-content: center;
@@ -776,4 +771,12 @@ code {
   .survey-frame {
     min-height: 460px;
   }
+}
+.chat-action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* Keeps the button aligned to the left */
+  width: 100%;
+  margin-top: auto; /* <--- THIS forces it to the bottom of the outer card */
 }

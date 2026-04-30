@@ -857,7 +857,7 @@ function renderQuestion() {
             })
             .join('')}
         </div>
-        <div class="action-row chat-action-row">
+        <div class="action-row">
           <button
             class="button primary"
             data-action="check-ai"
@@ -906,7 +906,7 @@ function renderQuestion() {
               : ''
           }
         </p>
-        <div class="action-row">
+        <div class="chat-action-row">
                   ${
             answerState.aiChecked
               ? `
