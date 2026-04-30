@@ -149,29 +149,28 @@ function renderTable() {
 
 function buildSummaryRows() {
   return participants.map((entry) => {
-    // Calculate total time taken for the whole experiment in seconds
-    let totalTimeSec = '';
-    if (entry.completedAt && entry.consentedAt) {
-      totalTimeSec = ((entry.completedAt - entry.consentedAt) / 1000).toFixed(2);
-    }
-
-    // Set up the exact columns you requested
+    // 1. Initialize the row with the exact base columns matching the Excel file
     const row = {
       participantId: entry.participantId,
       difficultyLevel: entry.difficultyLevel ?? '',
-      total_time_taken_sec: totalTimeSec,
     };
 
-    // Iterate through all questions to get answers and duration
-    experimentContent.questions.forEach((question) => {
-      const answer = entry.answers?.[question.id] ?? {};
-      
-      row[`${question.id}_answer`] = answer.selectedOptionId ?? '';
-      
-      row[`${question.id}_time_taken_sec`] = answer.totalDurationMs 
-        ? (answer.totalDurationMs / 1000).toFixed(2) 
-        : '';
-    });
+    // 2. Add Attitude Survey answers (attitudeSurvey_1 to attitudeSurvey_6)
+    // We safely pull the question IDs from experimentContent to find their answers
+    const attitudeQuestions = experimentContent?.attitudeSurvey?.questions || [];
+    for (let i = 0; i < 6; i++) {
+      const qId = attitudeQuestions[i]?.id || String(i + 1);
+      row[`attitudeSurvey_${i + 1}`] = entry.attitudeSurvey?.answers?.[qId] ?? '';
+    }
+
+    // 3. Add Task answers (Q1 to Q6)
+    // We use entry.questionOrder to ensure we get the answers in the exact sequence they were shown
+    const qOrder = entry.questionOrder || [];
+    for (let i = 0; i < 6; i++) {
+      const qId = qOrder[i];
+      const answer = qId ? (entry.answers?.[qId] ?? {}) : {};
+      row[`Q${i + 1}`] = answer.selectedOptionId ?? '';
+    }
 
     return row;
   });
