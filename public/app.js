@@ -1072,6 +1072,11 @@ function renderQuestion() {
           ${
             answerState.aiChecked || showFinalMessage
               ? `
+                ${
+                  state.currentQuestionIndex === state.questionOrder.length - 1
+                    ? `<p style="width: 100%; margin: 0 0 4px 0; color: var(--muted); font-size: 0.95rem;">You’ve completed the task section. Next, you will answer a short questionnaire about your experience.</p>`
+                    : ''
+                }
                 <button class="button secondary" data-action="advance-question" type="button">
                   ${
                     state.currentQuestionIndex === state.questionOrder.length - 1
