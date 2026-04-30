@@ -686,7 +686,7 @@ function renderConsent() {
               <p class="summary-copy-copy">- After that, you will see a response from an AI system.</p>
               <p class="summary-copy"><strong><em>2. Questionnaire</em></strong></p>
               <p class="summary-copy-copy">- We kindly ask you to respond as carefully and sincerely as possible.</p>
-              <p class="summary-copy">Please answer based on your own judgment and read the AI’s response before moving on to the next question.</p>
+              <p class="summary-copy">Please answer based on your own judgment and read the AI\'s response before moving on to the next question.</p>
             </details>
 
             <details class="accordion-item">
