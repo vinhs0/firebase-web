@@ -88,9 +88,9 @@ async function boot() {
     setSyncStatus('idle', 'Local');
   }
 
-  if (state.currentStage === 'question') {
-    ensureQuestionViewLogged();
-  }
+  // if (state.currentStage === 'question') {
+  //   ensureQuestionViewLogged();
+  // }
 
   if (state.currentStage === 'survey' && !state.survey.startedAt) {
     state.survey.startedAt = Date.now();
