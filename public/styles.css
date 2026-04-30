@@ -181,6 +181,12 @@ body::before {
   max-width: 100%;
 }
 
+.summary-copy-copy {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  max-width: 100%;
+}
+
 .bullet-list,
 .contact-list,
 .detail-list {
@@ -216,7 +222,7 @@ body::before {
 .hero-aside {
   padding: clamp(22px, 3vw, 34px);
   background:
-    linear-gradient(180deg, rgba(15, 118, 110, 0.1), transparent 26%),
+    /* linear-gradient(180deg, rgba(15, 118, 110, 0.1), transparent 26%), */
     rgba(255, 250, 243, 0.78);
 }
 
@@ -344,6 +350,91 @@ body::before {
   font-size: 1rem;
   line-height: 1.45;
   margin: 0;
+}
+
+/* 1. Spacing for the main container */
+.accordion-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Adds space between each individual container */
+  max-width: 600px; 
+}
+
+/* 2. Individual Container Styling (The Box) */
+.accordion-item {
+  background-color: #ffffff; /* Matches your clean design */
+  border: 1px solid #e0e0e0; /* Subtle border */
+  border-radius: 8px; /* Rounded corners */
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Slight shadow for depth */
+}
+
+/* 3. Summary (Clickable area) styling */
+.accordion-item summary {
+  display: flex;
+  justify-content: space-between; /* Pushes the text left and chevron right */
+  align-items: center;
+  cursor: pointer;
+  list-style: none; /* Removes default triangle in standard browsers */
+  margin: -16px; /* Extends clickable area to the container edges */
+  padding: 16px; 
+}
+
+/* 4. Remove default triangle in WebKit browsers (Chrome/Safari) */
+.accordion-item summary::-webkit-details-marker {
+  display: none;
+}
+
+/* 5. Add the Custom Chevron */
+.accordion-item summary::after {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #333;
+  border-bottom: 2px solid #333;
+  transform: rotate(45deg); /* Points down */
+  transition: transform 0.3s ease; /* Smooth rotation */
+  margin-left: 12px; /* Space between text and chevron */
+}
+
+/* 6. Rotate Chevron when open */
+.accordion-item[open] summary::after {
+  transform: rotate(-135deg); /* Points up */
+}
+
+:root {
+  interpolate-size: allow-keywords;
+}
+
+/* 2. Target the internal wrapper of the details element */
+.accordion-item::details-content {
+  height: 0;
+  overflow: hidden; /* Keeps text from spilling out during animation */
+  transition: height 0.3s ease, content-visibility 0.3s ease; /* Syncs exactly with your chevron */
+}
+
+/* 3. Expand to full height when open */
+.accordion-item[open]::details-content {
+  height: auto;
+}
+
+/* 4. Fallback for older browsers (Fades the text in smoothly if height transition isn't supported) */
+@supports not (interpolate-size: allow-keywords) {
+  .accordion-item[open] summary ~ * {
+    animation: slideDownFade 0.3s ease-out;
+  }
+}
+
+@keyframes slideDownFade {
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
 /* Attitude Survey Styles */

@@ -674,35 +674,45 @@ function renderConsent() {
           
           <p>Your responses will help us gain insights into how people use AI to support their thinking and decision-making.</p>
         </div>
-        <div class="accordion-container">
-          <details>
-            <summary><strong>What you will do</strong></summary>
-            <p class="summary-copy">You will complete a series of short reasoning and decision-making tasks. For each task, you will first select an answer based on your own judgment, and then view a response from an AI system. After completing the tasks, you will be directed to a short questionnaire. Please make sure to complete both parts for your responses to be recorded.</p>
-            <p class="summary-copy">We kindly ask you to respond as carefully and sincerely as possible.</p>
-          </details>
+        <article>
+          <div class="accordion-container">
+            
+            <details class="accordion-item" open>
+              <summary><strong>What you will do</strong></summary>
+              <p class="summary-copy">You will complete a short study in two parts:</p>
+              <p class="summary-copy"><strong><em>1. Task section</em></strong></p>
+              <p class="summary-copy-copy">- You will answer a series of short reasoning and decision-making questions.</p>
+              <p class="summary-copy-copy">- For each question, you will first choose an answer based on your own judgment.</p>
+              <p class="summary-copy-copy">- After that, you will see a response from an AI system.</p>
+              <p class="summary-copy"><strong><em>2. Questionnaire</em></strong></p>
+              <p class="summary-copy-copy">- We kindly ask you to respond as carefully and sincerely as possible.</p>
+              <p class="summary-copy-copy">- Please answer based on your own judgment and read the AI’s response before moving on to the next question.</p>
+            </details>
 
-          <details>
-            <summary><strong>Time required</strong></summary>
-            <p class="summary-copy">The study will take approximately <strong>10~15 minutes.</strong></p>
-          </details>
+            <details class="accordion-item">
+              <summary><strong>Time required</strong></summary>
+              <p class="summary-copy">The study will take approximately <strong>10~15 minutes.</strong></p>
+            </details>
 
-          <details>
-            <summary><strong>Confidentiality</strong></summary>
-            <p class="summary-copy">All responses will be kept confidential and used for research purposes only. No personally identifying information will be linked to your responses.</p>
-          </details>
+            <details class="accordion-item">
+              <summary><strong>Confidentiality</strong></summary>
+              <p class="summary-copy">All responses will be kept confidential and used for research purposes only. No personally identifying information will be linked to your responses.</p>
+            </details>
 
-          <details>
-            <summary><strong>Voluntary participation and Risks and discomfort</strong></summary>
-            <p class="summary-copy">There are no known risks beyond those encountered in everyday activities.</p>
-            <p class="summary-copy">Participation is voluntary. You may stop participating at any time without disadvantage or penalty.</p>
-            <p class="summary-copy">Please note that some questions require a response in order to proceed through the study.</p>
-          </details>
+            <details class="accordion-item">
+              <summary><strong>Voluntary participation and Risks and discomfort</strong></summary>
+              <p class="summary-copy">There are no known risks beyond those encountered in everyday activities.</p>
+              <p class="summary-copy">Participation is voluntary. You may stop participating at any time without disadvantage or penalty.</p>
+              <p class="summary-copy">Please note that some questions require a response in order to proceed through the study.</p>
+            </details>
 
-          <details>
-            <summary><strong>Study procedure notice</strong></summary>
-            <p class="summary-copy">To ensure the validity of the research, some aspects of the study cannot be fully explained in advance. A full explanation will be provided at the end of the study.</p>
-          </details>
-        </div>
+            <details class="accordion-item">
+              <summary><strong>Study procedure notice</strong></summary>
+              <p class="summary-copy">To ensure the validity of the research, some aspects of the study cannot be fully explained in advance. A full explanation will be provided at the end of the study.</p>
+            </details>
+
+          </div>
+        </article>
       </article>
 
       <aside class="surface hero-aside">
