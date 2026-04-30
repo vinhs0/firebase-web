@@ -108,6 +108,8 @@ function createAnswerState() {
     selectedOptionId: null,
     firstAnsweredAt: null,
     answeredAt: null,
+    aiLoading: false,
+    aiChecked: false,
     aiChecked: false,
     aiCheckedAt: null,
     skippedAi: false,
@@ -236,7 +238,7 @@ function initializeParticipantSession() {
   });
   recordEvent('consent_granted');
   recordEvent('difficulty_assigned', { difficultyLevel });
-  ensureQuestionViewLogged();
+  // ensureQuestionViewLogged();
   persistState();
   renderStageAndFocus();
   void syncParticipantState();
@@ -522,20 +524,30 @@ function revealAiResponse() {
 
   const answerState = state.answers[question.id];
 
-  if (!answerState.selectedOptionId || answerState.aiChecked) {
+  // Prevent multiple clicks while it is already loading or checked
+  if (!answerState.selectedOptionId || answerState.aiChecked || answerState.aiLoading) {
     return;
   }
 
-  answerState.aiChecked = true;
-  answerState.aiCheckedAt = Date.now();
+  // 1. Turn on the typing indicator and update the UI
+  answerState.aiLoading = true;
+  renderStageAndFocus(false); 
 
-  recordEvent('ai_checked', {
-    questionId: question.id,
-    optionId: answerState.selectedOptionId,
-  });
-  persistState();
-  renderStageAndFocus();
-  void syncParticipantState();
+  // 2. Wait 1.5 seconds, then show the AI response
+  setTimeout(() => {
+    answerState.aiLoading = false;
+    answerState.aiChecked = true;
+    answerState.aiCheckedAt = Date.now();
+
+    recordEvent('ai_checked', {
+      questionId: question.id,
+      optionId: answerState.selectedOptionId,
+    });
+    
+    persistState();
+    renderStageAndFocus();
+    void syncParticipantState();
+  }, 1500); // 1500ms = 1.5 seconds. Change this number to make it faster/slower!
 }
 
 function finalizeCurrentQuestion(skipAi) {
@@ -813,6 +825,49 @@ function renderQuestion() {
     ? getAiMessages(question.id, answerState.selectedOptionId, state.conditionId)
     : [];
 
+  // --- NEW LOGIC: Sequential loading with a system delay pause ---
+  const isFirstQuestion = state.currentQuestionIndex === 0;
+  const typingDelay = 1500; // 1.5 seconds per AI bubble
+  const systemDelay = 1000; // 1.0 second pause before the system bubble pops in
+  const finalPhase = isFirstQuestion ? 3 : 2; 
+  let introPhase = 0; 
+
+  if (answerState.questionStartedAt) {
+    const elapsed = Date.now() - answerState.questionStartedAt;
+    
+    if (isFirstQuestion) {
+      if (elapsed < typingDelay) {
+        introPhase = 0;
+        setTimeout(() => render(), typingDelay - elapsed);
+      } else if (elapsed < typingDelay * 2) {
+        introPhase = 1;
+        setTimeout(() => render(), (typingDelay * 2) - elapsed);
+      } else if (elapsed < (typingDelay * 2) + systemDelay) {
+        introPhase = 2; // AI is done. Pause before system bubble.
+        setTimeout(() => render(), ((typingDelay * 2) + systemDelay) - elapsed);
+      } else {
+        introPhase = 3; // Fully complete
+      }
+    } else {
+      if (elapsed < typingDelay) {
+        introPhase = 0;
+        setTimeout(() => render(), typingDelay - elapsed);
+      } else if (elapsed < typingDelay + systemDelay) {
+        introPhase = 1; // AI is done. Pause before system bubble.
+        setTimeout(() => render(), (typingDelay + systemDelay) - elapsed);
+      } else {
+        introPhase = 2; // Fully complete
+      }
+    }
+  } else {
+     introPhase = finalPhase; // Fallback just in case
+  }
+  
+  // Determines if the AI has finished its typing animations
+  const isAiIntroDone = introPhase >= (isFirstQuestion ? 2 : 1);
+  // Determines if it is time to pop in the system bubble
+  const showSystemBubble = introPhase === finalPhase;
+
   return `
     <section class="question-grid">
       <article class="surface question-card">
@@ -862,7 +917,7 @@ function renderQuestion() {
             class="button primary"
             data-action="check-ai"
             type="button"
-            ${answerState.selectedOptionId && !answerState.aiChecked ? '' : 'disabled'}
+            ${answerState.selectedOptionId && !answerState.aiChecked && !answerState.aiLoading && isAiIntroDone ? '' : 'disabled'}
           >
             ${experimentContent.quiz.checkButton}
           </button>
@@ -875,12 +930,38 @@ function renderQuestion() {
         </div>
         <div class="chat-thread">
           ${
-            state.currentQuestionIndex === 0
-              ? '<div class="chat-bubble ai">Hi, I\'m KAI. I\'ll provide brief feedback after each task.</div>'
-              : ''
+            // --- Intro Animation Sequence ---
+            isFirstQuestion
+              ? introPhase === 0
+                ? `
+                  <div class="chat-bubble ai typing">
+                    <div class="typing-dots"><span></span><span></span><span></span></div>
+                  </div>
+                `
+                : introPhase === 1
+                ? `
+                  <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedback after each task.</div>
+                  <div class="chat-bubble ai typing">
+                    <div class="typing-dots"><span></span><span></span><span></span></div>
+                  </div>
+                `
+                : `
+                  <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedback after each task.</div>
+                  <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing. Take a moment to review the question and choose the option that best fits your judgment.</div>
+                `
+              : introPhase === 0
+                ? `
+                  <div class="chat-bubble ai typing">
+                    <div class="typing-dots"><span></span><span></span><span></span></div>
+                  </div>
+                `
+                : `
+                  <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing.</div>
+                `
           }
-          <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing. Take a moment to review the question and choose the option that best fits your judgment.</div>
+          
           ${
+            // --- User/System Instructions ---
             answerState.selectedOptionId
               ? `
                 <div class="chat-bubble user">
@@ -889,14 +970,28 @@ function renderQuestion() {
                   }
                 </div>
               `
-              : '<div class="chat-bubble system">Take a moment to review the question and choose the option that best fits your judgment.</div>'
+              : showSystemBubble
+                ? '<div class="chat-bubble system">Take a moment to review the question and choose the option that best fits your judgment.</div>'
+                : '' // Keep hidden during the delay phase
           }
+
           ${
-            answerState.aiChecked
-              ? aiMessages.map((message) => `<div class="chat-bubble ${message.role}">${message.text}</div>`).join('')
-              : answerState.selectedOptionId
-                ? '<div class="chat-bubble system">Press "Ask KAI" to check your answer with KAI.</div>'
-                : ''
+            // --- Final AI Check logic ---
+            isAiIntroDone
+              ? answerState.aiLoading
+                ? `
+                  <div class="chat-bubble ai typing">
+                    <div class="typing-dots">
+                      <span></span><span></span><span></span>
+                    </div>
+                  </div>
+                `
+                : answerState.aiChecked
+                  ? aiMessages.map((message) => `<div class="chat-bubble ${message.role}">${message.text}</div>`).join('')
+                  : answerState.selectedOptionId && showSystemBubble
+                    ? '<div class="chat-bubble system">Press "Ask KAI" to check your answer with KAI.</div>'
+                    : ''
+              : ''
           }
         </div>
         <p class="chat-hint">
@@ -907,7 +1002,7 @@ function renderQuestion() {
           }
         </p>
         <div class="chat-action-row">
-                  ${
+          ${
             answerState.aiChecked
               ? `
                 <button class="button secondary" data-action="advance-question" type="button">
