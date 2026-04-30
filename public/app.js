@@ -529,25 +529,17 @@ function revealAiResponse() {
     return;
   }
 
-  // 1. Turn on the typing indicator and update the UI
+  // 1. Mark the exact time the user clicked the button
+  answerState.aiRequestedAt = Date.now();
+  
+  // 2. Turn on the loading state
   answerState.aiLoading = true;
-  renderStageAndFocus(false); 
 
-  // 2. Wait 1.5 seconds, then show the AI response
-  setTimeout(() => {
-    answerState.aiLoading = false;
-    answerState.aiChecked = true;
-    answerState.aiCheckedAt = Date.now();
+  // IMPORTANT: We do NOT set aiChecked = true here anymore! 
+  // The renderQuestion function will automatically turn it to true when the 4.5 second animation finishes.
 
-    recordEvent('ai_checked', {
-      questionId: question.id,
-      optionId: answerState.selectedOptionId,
-    });
-    
-    persistState();
-    renderStageAndFocus();
-    void syncParticipantState();
-  }, 1500); // 1500ms = 1.5 seconds. Change this number to make it faster/slower!
+  persistState();
+  renderStageAndFocus(false);
 }
 
 function finalizeCurrentQuestion(skipAi) {
@@ -826,20 +818,22 @@ function renderQuestion() {
   }
 
   const answerState = state.answers[question.id];
-  const aiMessages = answerState.aiChecked
+  
+  // FIX 1: We now generate the AI messages as soon as the user selects an option.
+  // This ensures the text is ready to be rendered during the middle animation phase!
+  const aiMessages = answerState.selectedOptionId
     ? getAiMessages(question.id, answerState.selectedOptionId, state.conditionId)
     : [];
 
-  // --- NEW LOGIC: Sequential loading with a system delay pause ---
+  // --- INTRO LOGIC (Runs when question loads) ---
   const isFirstQuestion = state.currentQuestionIndex === 0;
-  const typingDelay = 1500; // 1.5 seconds per AI bubble
-  const systemDelay = 1000; // 1.0 second pause before the system bubble pops in
-  const finalPhase = isFirstQuestion ? 3 : 2; 
+  const typingDelay = 1500; 
+  const systemDelay = 1000; 
+  const introFinalPhase = isFirstQuestion ? 3 : 2; 
   let introPhase = 0; 
 
   if (answerState.questionStartedAt) {
     const elapsed = Date.now() - answerState.questionStartedAt;
-    
     if (isFirstQuestion) {
       if (elapsed < typingDelay) {
         introPhase = 0;
@@ -848,30 +842,62 @@ function renderQuestion() {
         introPhase = 1;
         setTimeout(() => render(), (typingDelay * 2) - elapsed);
       } else if (elapsed < (typingDelay * 2) + systemDelay) {
-        introPhase = 2; // AI is done. Pause before system bubble.
+        introPhase = 2; 
         setTimeout(() => render(), ((typingDelay * 2) + systemDelay) - elapsed);
       } else {
-        introPhase = 3; // Fully complete
+        introPhase = 3; 
       }
     } else {
       if (elapsed < typingDelay) {
         introPhase = 0;
         setTimeout(() => render(), typingDelay - elapsed);
       } else if (elapsed < typingDelay + systemDelay) {
-        introPhase = 1; // AI is done. Pause before system bubble.
+        introPhase = 1; 
         setTimeout(() => render(), (typingDelay + systemDelay) - elapsed);
       } else {
-        introPhase = 2; // Fully complete
+        introPhase = 2; 
       }
     }
   } else {
-     introPhase = finalPhase; // Fallback just in case
+     introPhase = introFinalPhase; 
   }
-  
-  // Determines if the AI has finished its typing animations
-  const isAiIntroDone = introPhase >= (isFirstQuestion ? 2 : 1);
-  // Determines if it is time to pop in the system bubble
-  const showSystemBubble = introPhase === finalPhase;
+  const isIntroComplete = introPhase === introFinalPhase;
+
+
+  // --- FEEDBACK LOGIC (Runs when "Ask KAI" is clicked) ---
+  let feedbackPhase = 0;
+  if (answerState.aiLoading && answerState.aiRequestedAt) {
+    const fbElapsed = Date.now() - answerState.aiRequestedAt;
+    
+    if (fbElapsed < typingDelay) {
+      feedbackPhase = 0; // Typing "Thanks"
+      setTimeout(() => render(), typingDelay - fbElapsed);
+    } else if (fbElapsed < typingDelay * 2) {
+      feedbackPhase = 1; // Thanks visible, Typing Answer
+      setTimeout(() => render(), (typingDelay * 2) - fbElapsed);
+    } else if (fbElapsed < typingDelay * 3) {
+      feedbackPhase = 2; // Answer visible, Typing "When you're ready"
+      setTimeout(() => render(), (typingDelay * 3) - fbElapsed);
+    } else {
+      // Sequence complete!
+      answerState.aiLoading = false;
+      answerState.aiChecked = true;
+      answerState.aiCheckedAt = Date.now();
+      
+      recordEvent('ai_checked', {
+        questionId: question.id,
+        optionId: answerState.selectedOptionId,
+      });
+      
+      persistState();
+      setTimeout(() => renderStageAndFocus(false), 0);
+    }
+  }
+
+  // These booleans power the HTML blocks below
+  const showThanks = feedbackPhase >= 1 || answerState.aiChecked;
+  const showAiResponse = feedbackPhase >= 2 || answerState.aiChecked;
+  const showFinalMessage = answerState.aiChecked; // Only true when completely finished
 
   return `
     <section class="question-grid">
@@ -922,7 +948,7 @@ function renderQuestion() {
             class="button primary"
             data-action="check-ai"
             type="button"
-            ${answerState.selectedOptionId && !answerState.aiChecked && !answerState.aiLoading && isAiIntroDone ? '' : 'disabled'}
+            ${answerState.selectedOptionId && !answerState.aiChecked && !answerState.aiLoading && isIntroComplete ? '' : 'disabled'}
           >
             ${experimentContent.quiz.checkButton}
           </button>
@@ -935,38 +961,47 @@ function renderQuestion() {
         </div>
         <div class="chat-thread">
           ${
-            // --- Intro Animation Sequence ---
+            // --- FIX 2: Fixed the HTML animation logic for subsequent questions! ---
             isFirstQuestion
-              ? introPhase === 0
-                ? `
-                  <div class="chat-bubble ai typing">
-                    <div class="typing-dots"><span></span><span></span><span></span></div>
-                  </div>
-                `
-                : introPhase === 1
-                ? `
-                  <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedback after each task.</div>
-                  <div class="chat-bubble ai typing">
-                    <div class="typing-dots"><span></span><span></span><span></span></div>
-                  </div>
-                `
+              ? !isIntroComplete
+                ? introPhase === 0
+                  ? `
+                    <div class="chat-bubble ai typing">
+                      <div class="typing-dots"><span></span><span></span><span></span></div>
+                    </div>
+                  `
+                  : introPhase === 1
+                    ? `
+                      <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedback after each task.</div>
+                      <div class="chat-bubble ai typing">
+                        <div class="typing-dots"><span></span><span></span><span></span></div>
+                      </div>
+                    `
+                    : `
+                      <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedback after each task.</div>
+                      <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing.</div>
+                    `
                 : `
                   <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedback after each task.</div>
-                  <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing. Take a moment to review the question and choose the option that best fits your judgment.</div>
+                  <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing.</div>
                 `
-              : introPhase === 0
-                ? `
-                  <div class="chat-bubble ai typing">
-                    <div class="typing-dots"><span></span><span></span><span></span></div>
-                  </div>
-                `
+              : !isIntroComplete
+                ? introPhase === 0
+                  ? `
+                    <div class="chat-bubble ai typing">
+                      <div class="typing-dots"><span></span><span></span><span></span></div>
+                    </div>
+                  `
+                  : `
+                    <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing.</div>
+                  `
                 : `
                   <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing.</div>
                 `
           }
           
           ${
-            // --- User/System Instructions ---
+            // --- User Selection ---
             answerState.selectedOptionId
               ? `
                 <div class="chat-bubble user">
@@ -975,28 +1010,52 @@ function renderQuestion() {
                   }
                 </div>
               `
-              : showSystemBubble
+              : isIntroComplete && !answerState.aiChecked && !answerState.aiLoading
                 ? '<div class="chat-bubble system">Take a moment to review the question and choose the option that best fits your judgment.</div>'
-                : '' // Keep hidden during the delay phase
+                : '' 
           }
 
           ${
-            // --- Final AI Check logic ---
-            isAiIntroDone
-              ? answerState.aiLoading
-                ? `
-                  <div class="chat-bubble ai typing">
-                    <div class="typing-dots">
-                      <span></span><span></span><span></span>
-                    </div>
-                  </div>
-                `
-                : answerState.aiChecked
-                  ? aiMessages.map((message) => `<div class="chat-bubble ${message.role}">${message.text}</div>`).join('')
-                  : answerState.selectedOptionId && showSystemBubble
-                    ? '<div class="chat-bubble system">Press "Ask KAI" to check your answer with KAI.</div>'
+            // --- Sequential AI Feedback Sequence ---
+            answerState.aiChecked || answerState.aiLoading
+              ? `
+                ${
+                  !showThanks
+                    ? `
+                      <div class="chat-bubble ai typing">
+                        <div class="typing-dots"><span></span><span></span><span></span></div>
+                      </div>
+                    `
+                    : `<div class="chat-bubble ai">Thanks. Here’s my feedback.</div>`
+                }
+                
+                ${
+                  showThanks
+                    ? !showAiResponse
+                      ? `
+                        <div class="chat-bubble ai typing">
+                          <div class="typing-dots"><span></span><span></span><span></span></div>
+                        </div>
+                      `
+                      : aiMessages.map((message) => `<div class="chat-bubble ${message.role}">${message.text}</div>`).join('')
                     : ''
-              : ''
+                }
+
+                ${
+                  showAiResponse
+                    ? !showFinalMessage
+                      ? `
+                        <div class="chat-bubble ai typing">
+                          <div class="typing-dots"><span></span><span></span><span></span></div>
+                        </div>
+                      `
+                      : `<div class="chat-bubble ai">When you’re ready, please continue to the next task.</div>`
+                    : ''
+                }
+              `
+              : answerState.selectedOptionId && isIntroComplete
+                ? '<div class="chat-bubble system">Press "Ask KAI" to check your answer with KAI.</div>'
+                : ''
           }
         </div>
         <p class="chat-hint">
@@ -1008,7 +1067,7 @@ function renderQuestion() {
         </p>
         <div class="chat-action-row">
           ${
-            answerState.aiChecked
+            answerState.aiChecked || showFinalMessage
               ? `
                 <button class="button secondary" data-action="advance-question" type="button">
                   ${
