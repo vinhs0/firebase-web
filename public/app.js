@@ -212,7 +212,24 @@ function setSyncStatus(mode, message) {
 
 function initializeParticipantSession() {
   const condition = chooseRandomItem(conditionMatrix);
-  const difficultyLevel = chooseRandomItem(Object.keys(experimentContent.questionBanks));
+  // let difficultyLevel = chooseRandomItem(Object.keys(experimentContent.questionBanks));
+
+  // --- DEV FEATURE: Force difficulty via URL ---
+  const urlParams = new URLSearchParams(window.location.search);
+  const forcedDifficulty = urlParams.get('difficulty');
+  const validDifficulties = Object.keys(experimentContent.questionBanks);
+  
+  let difficultyLevel;
+  
+  if (forcedDifficulty && validDifficulties.includes(forcedDifficulty)) {
+    difficultyLevel = forcedDifficulty;
+    console.log(`🔧 [DEV] Difficulty forced via URL: ${difficultyLevel}`);
+  } else {
+    // Normal random behavior
+    difficultyLevel = chooseRandomItem(validDifficulties);
+  }
+  // -------------------------------------------
+
   const questionOrder = getQuestionsByDifficulty(difficultyLevel).map((question) => question.id);
   const freshState = createBlankState();
   const now = Date.now();
@@ -238,6 +255,11 @@ function initializeParticipantSession() {
   });
   recordEvent('consent_granted');
   recordEvent('difficulty_assigned', { difficultyLevel });
+
+  if (state.currentStage === 'question') {
+    ensureQuestionViewLogged();
+  }
+
   // ensureQuestionViewLogged();
   persistState();
   renderStageAndFocus();
