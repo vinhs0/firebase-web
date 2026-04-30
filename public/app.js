@@ -324,9 +324,9 @@ async function syncParticipantState() {
       persistState();
     }
 
-    setSyncStatus('synced', 'Đã đồng bộ với Firebase');
+    setSyncStatus('synced', '');
   } catch (error) {
-    setSyncStatus('error', `Đồng bộ thất bại: ${error.message}`);
+    setSyncStatus('error', `${error.message}`);
   } finally {
     syncInFlight = false;
   }
