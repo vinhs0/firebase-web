@@ -755,6 +755,10 @@ code {
     justify-content: space-between;
   }
 
+  .likert-bound {
+    display: none;
+  }
+
   .option-card {
     padding-left: 66px;
   }

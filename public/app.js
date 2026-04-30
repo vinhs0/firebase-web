@@ -776,6 +776,7 @@ function renderAttitudeSurvey() {
       <div class="summary-copy">
         <p>${content.intro}</p>
         <p><strong>${content.instruction}</strong></p>
+        <p>(With 1 - Strongly agree and 7 - Strongly disagree)</p>
       </div>
 
       <div class="attitude-list">
@@ -799,7 +800,11 @@ function renderAttitudeSurvey() {
           </div>
         `).join('')}
       </div>
-
+      <div style="opacity: ${allAnswered ? '1' : '0'}; transition: opacity 0.3s ease; margin-bottom: 16px;">
+        <p>
+          You will now begin the task section. During this part, you will receive feedback from an AI assistant.
+        </p>
+      </div>
       <div class="action-row">
         <button class="button primary" data-action="finish-attitude-survey" type="button" ${allAnswered ? '' : 'disabled'}>
           ${content.nextButton}
