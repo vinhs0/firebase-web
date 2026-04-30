@@ -857,7 +857,7 @@ function renderQuestion() {
             })
             .join('')}
         </div>
-        <div class="action-row">
+        <div class="action-row chat-action-row">
           <button
             class="button primary"
             data-action="check-ai"
@@ -866,19 +866,6 @@ function renderQuestion() {
           >
             ${experimentContent.quiz.checkButton}
           </button>
-          ${
-            answerState.aiChecked
-              ? `
-                <button class="button secondary" data-action="advance-question" type="button">
-                  ${
-                    state.currentQuestionIndex === state.questionOrder.length - 1
-                      ? experimentContent.quiz.finalButton
-                      : experimentContent.quiz.nextButton
-                  }
-                </button>
-              `
-              : ''
-          }
         </div>
       </article>
 
@@ -919,6 +906,21 @@ function renderQuestion() {
               : ''
           }
         </p>
+        <div class="action-row">
+                  ${
+            answerState.aiChecked
+              ? `
+                <button class="button secondary" data-action="advance-question" type="button">
+                  ${
+                    state.currentQuestionIndex === state.questionOrder.length - 1
+                      ? experimentContent.quiz.finalButton
+                      : experimentContent.quiz.nextButton
+                  }
+                </button>
+              `
+              : ''
+          }
+        </div>
       </aside>
     </section>
   `;
