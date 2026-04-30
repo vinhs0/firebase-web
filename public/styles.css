@@ -352,40 +352,35 @@ body::before {
   margin: 0;
 }
 
-/* 1. Spacing for the main container */
 .accordion-container {
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Adds space between each individual container */
+  gap: 12px; 
   max-width: 600px; 
 }
 
-/* 2. Individual Container Styling (The Box) */
 .accordion-item {
-  background-color: #ffffff; /* Matches your clean design */
-  border: 1px solid #e0e0e0; /* Subtle border */
-  border-radius: 8px; /* Rounded corners */
+  background-color: #ffffff; 
+  border: 1px solid #e0e0e0; 
+  border-radius: 8px; 
   padding: 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Slight shadow for depth */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
 }
 
-/* 3. Summary (Clickable area) styling */
 .accordion-item summary {
   display: flex;
-  justify-content: space-between; /* Pushes the text left and chevron right */
+  justify-content: space-between; 
   align-items: center;
   cursor: pointer;
-  list-style: none; /* Removes default triangle in standard browsers */
-  margin: -16px; /* Extends clickable area to the container edges */
+  list-style: none; 
+  margin: -16px; 
   padding: 16px; 
 }
 
-/* 4. Remove default triangle in WebKit browsers (Chrome/Safari) */
 .accordion-item summary::-webkit-details-marker {
   display: none;
 }
 
-/* 5. Add the Custom Chevron */
 .accordion-item summary::after {
   content: "";
   display: inline-block;
@@ -393,33 +388,30 @@ body::before {
   height: 8px;
   border-right: 2px solid #333;
   border-bottom: 2px solid #333;
-  transform: rotate(45deg); /* Points down */
-  transition: transform 0.3s ease; /* Smooth rotation */
-  margin-left: 12px; /* Space between text and chevron */
+  transform: rotate(45deg); 
+  transition: transform 0.3s ease; 
+  margin-left: 12px; 
 }
 
-/* 6. Rotate Chevron when open */
 .accordion-item[open] summary::after {
-  transform: rotate(-135deg); /* Points up */
+  transform: rotate(-135deg); 
 }
 
 :root {
   interpolate-size: allow-keywords;
 }
 
-/* 2. Target the internal wrapper of the details element */
 .accordion-item::details-content {
   height: 0;
-  overflow: hidden; /* Keeps text from spilling out during animation */
-  transition: height 0.3s ease, content-visibility 0.3s ease; /* Syncs exactly with your chevron */
+  overflow: hidden; 
+  transition: height 0.3s ease, content-visibility 0.3s ease; 
 }
 
-/* 3. Expand to full height when open */
 .accordion-item[open]::details-content {
   height: auto;
 }
 
-/* 4. Fallback for older browsers (Fades the text in smoothly if height transition isn't supported) */
+/* 4. Fallback for older browsers */
 @supports not (interpolate-size: allow-keywords) {
   .accordion-item[open] summary ~ * {
     animation: slideDownFade 0.3s ease-out;
@@ -492,18 +484,6 @@ body::before {
   font-size: 0.85rem;
   color: var(--muted);
   font-weight: 500;
-}
-
-@media (max-width: 640px) {
-  .likert-scale {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .likert-radios {
-    width: 100%;
-    justify-content: space-between;
-  }
 }
 
 .option-list {
@@ -722,6 +702,25 @@ code {
   }
 }
 
+/* ---------------------------------------------------
+   NEW ADDITION: Forces Chat Box to top on Mobile
+------------------------------------------------------*/
+@media (max-width: 768px) {
+  .question-grid {
+    display: flex; 
+    flex-direction: column; 
+  }
+
+  .chat-card {
+    order: -1; 
+  }
+
+  .question-card {
+    order: 2; 
+  }
+}
+/* ---------------------------------------------------*/
+
 @media (max-width: 640px) {
   .page-shell {
     width: min(100vw - 16px, 100%);
@@ -733,6 +732,17 @@ code {
   .progress-meta {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .likert-scale {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .likert-radios {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .option-card {
@@ -752,4 +762,3 @@ code {
     min-height: 460px;
   }
 }
-
