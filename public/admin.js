@@ -65,39 +65,59 @@ async function handleLogin(event) {
     dashboard.classList.remove('hidden');
     await refreshDashboard();
   } catch (error) {
-    authStatus.textContent = `Đăng nhập thất bại: ${error.message}`;
+    authStatus.textContent = `Log in failed: ${error.message}`;
   }
 }
 
 async function refreshDashboard() {
-  authStatus.textContent = 'Đang tải dữ liệu participant...';
+  authStatus.textContent = 'Loading participants\' data...';
 
   try {
     participants = await fetchAllParticipants();
     renderMetrics();
     renderTable();
-    authStatus.textContent = `Đã tải ${participants.length} participant.`;
+    authStatus.textContent = `Loaded ${participants.length} participant.`;
   } catch (error) {
-    authStatus.textContent = `Không thể tải dữ liệu: ${error.message}`;
+    authStatus.textContent = `ERROR: ${error.message}`;
   }
 }
 
 function renderMetrics() {
-  const completed = participants.filter((entry) => entry.completedAt).length;
-  const interacted = participants.filter((entry) => (entry.aiCheckCount ?? 0) > 0).length;
-  const avgAiChecks =
-    participants.length > 0
-      ? (
-          participants.reduce((sum, entry) => sum + (entry.aiCheckCount ?? 0), 0) /
-          participants.length
-        ).toFixed(2)
-      : '0.00';
+  // 1. Total Participants
+  const totalParticipants = participants.length;
+
+  // 2. Surveys Completed (Participant has a completedAt timestamp)
+  const completedParticipants = participants.filter((entry) => entry.completedAt);
+  const surveysCompleted = completedParticipants.length;
+
+  // 3. Breakdown by Difficulty Level (including 0 counts)
+  const difficultyCounts = {};
+  
+  // Pre-fill all possible difficulty levels with 0
+  if (experimentContent && experimentContent.questionBanks) {
+    Object.keys(experimentContent.questionBanks).forEach((level) => {
+      difficultyCounts[level] = 0;
+    });
+  }
+
+  // Count the actual completions
+  completedParticipants.forEach((entry) => {
+    const level = entry.difficultyLevel;
+    if (level) {
+      // Increment if it exists, or create it if it's somehow unexpected
+      difficultyCounts[level] = (difficultyCounts[level] || 0) + 1;
+    }
+  });
+
+  // Build the HTML for the dynamic difficulty breakdown
+  const difficultyCardsHTML = Object.entries(difficultyCounts)
+    .map(([level, count]) => metricCard(`Completed (${level})`, String(count)))
+    .join('');
 
   metrics.innerHTML = [
-    metricCard('Participants', String(participants.length)),
-    metricCard('Completed', String(completed)),
-    metricCard('Any AI check', String(interacted)),
-    metricCard('Avg AI checks', avgAiChecks),
+    metricCard('Total Participants', String(totalParticipants)),
+    metricCard('Surveys Completed', String(surveysCompleted)),
+    difficultyCardsHTML, // Append the breakdown cards
   ].join('');
 }
 
