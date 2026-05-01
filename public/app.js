@@ -10,6 +10,7 @@ import {
   isFirebaseEnabled,
   upsertParticipantEvent,
   upsertParticipantSnapshot,
+  signOutCurrentUser
 } from './firebase-runtime.js';
 import { runtimeConfig } from './firebase-config.js';
 import {
@@ -55,6 +56,17 @@ function renderStageAndFocus(smooth = true) {
   };
 
   const selector = selectorByStage[state.currentStage] ?? '.progress-card';
+
+  // const stopBtn = document.querySelector('#global-stop-btn');
+  // if (stopBtn) {
+  //   const hiddenStages = ['intro', 'consent', 'complete', 'stopped', 'declined'];
+    
+  //   if (hiddenStages.includes(state.currentStage)) {
+  //     stopBtn.style.display = 'none';
+  //   } else {
+  //     stopBtn.style.display = 'block'; // Shows the button on middle stages
+  //   }
+  // }
 
   requestAnimationFrame(() => {
     const element = document.querySelector(selector) ?? document.querySelector('.progress-card');
@@ -393,6 +405,28 @@ function handleClick(event) {
     return;
   }
 
+  if (action === 'restart-experiment') {
+    if (runtimeConfig && runtimeConfig.localStorageKey) {
+      localStorage.removeItem(runtimeConfig.localStorageKey);
+    }
+    signOutCurrentUser().finally(() => {
+      window.location.reload();
+    });
+    return;
+  }
+
+  if (action === 'stop-experiment') {
+    // Optional: Ask for confirmation before wiping their progress
+    if (!confirm("Are you sure you want to stop? Your progress will not be saved.")) {
+      return;
+    }
+
+    state.currentStage = 'stopped';
+    persistState();
+    renderStageAndFocus();
+    return;
+  }
+
   if (action === 'decline-experiment') {
     state = createBlankState();
     state.declined = true;
@@ -656,6 +690,11 @@ function render() {
     return;
   }
 
+  if (state.currentStage === 'stopped') {
+    appRoot.insertAdjacentHTML('beforeend', renderStopped());
+    return;
+  }
+
   appRoot.insertAdjacentHTML('beforeend', renderComplete());
 }
 
@@ -663,6 +702,25 @@ function renderDeclined() {
   return `
     <section class="surface surface-content">
       <p class="summary-copy">${experimentContent.intro.declineCopy}</p>
+    </section>
+  `;
+}
+
+function renderStopped() {
+  return `
+    <section class="surface surface-content">
+      <div class="section-heading">
+        <h2>Experiment Stopped</h2>
+      </div>
+      <p class="summary-copy">
+        You have chosen to end the experiment early. Your current progress has been halted.
+      </p>
+      
+      <div class="action-row">
+        <button class="button primary" data-action="restart-experiment" type="button">
+          Start a New Session
+        </button>
+      </div>
     </section>
   `;
 }
@@ -800,6 +858,16 @@ function renderAttitudeSurvey() {
       <div class="action-row">
         <button class="button primary" data-action="finish-attitude-survey" type="button" ${allAnswered ? '' : 'disabled'}>
           ${content.nextButton}
+        </button>
+      </div>
+      <div style="margin-top: 12px; padding-bottom: 12px; display: flex; justify-content: flex-start; width: 100%;">
+        <button 
+          class="button ghost" 
+          data-action="stop-experiment" 
+          type="button" 
+          style="color: var(--muted); text-decoration: underline;"
+        >
+          Stop the experiment
         </button>
       </div>
     </section>
@@ -1089,6 +1157,16 @@ function renderQuestion() {
           }
         </div>
       </aside>
+      <div style="margin-top: 12px; padding-bottom: 12px; display: flex; justify-content: flex-start; width: 100%;">
+        <button 
+          class="button ghost" 
+          data-action="stop-experiment" 
+          type="button" 
+          style="color: var(--muted); text-decoration: underline;"
+        >
+          Stop the experiment
+        </button>
+      </div>
     </section>
   `;
 }
@@ -1167,6 +1245,16 @@ function renderSurvey() {
           ${remainingSec > 0 ? `Please complete the survey` : experimentContent.survey.confirmButton}
         </button>
       </div>
+      <div style="margin-top: 12px; padding-bottom: 12px; display: flex; justify-content: flex-start; width: 100%;">
+        <button 
+          class="button ghost" 
+          data-action="stop-experiment" 
+          type="button" 
+          style="color: var(--muted); text-decoration: underline;"
+        >
+          Stop the experiment
+        </button>
+      </div>
     </section>
   `;
 }
@@ -1226,6 +1314,11 @@ function renderComplete() {
         <p>
           Email: <a href="mailto:ngocnguyen@ewha.ac.kr" class="email-link">ngocnguyen@ewha.ac.kr</a>
         </p>
+      </div>
+      <div class="action-row">
+        <button class="button primary" data-action="restart-experiment" type="button">
+          Start a New Session
+        </button>
       </div>
     </section>
   `;
