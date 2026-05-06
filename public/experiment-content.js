@@ -312,12 +312,6 @@ const questionBanks = {
 const allQuestions = [...wdlQuestions, ...wdhQuestions, ...idlQuestions, ...idhQuestions];
 
 export const experimentContent = {
-  intro: {
-    eyebrow: 'Study information & Consent',
-    title: 'An environment simulating AI-assisted tasks',
-    consentLabel: 'I agree and continue.',
-    declineCopy: 'You have chosen not to participate in this survey.',
-  },
   attitudeSurvey: {
     title: 'Your view on AI',
     intro: 'Welcome. You will begin with a short questionnaire about your general attitudes.',
@@ -345,31 +339,7 @@ export const experimentContent = {
     copy:
       'For this questionnaire, you MUST enter your ID. DO NOT enter a random string.',
     confirmButton: 'I completed the survey',
-    openFallbackButton: 'Open survey in a new tab',
   },
-  complete: {
-    title: 'Thank you for participating',
-    copy:
-      'The experiment is complete. You may now close this page. The participant ID is shown below for record matching if needed.',
-  },
-  factors: [
-    {
-      key: 'agreement',
-      label: 'Agreement style',
-      levels: [
-        { id: 'agree', label: 'Agree' },
-        { id: 'neutral', label: 'Neutral' },
-      ],
-    },
-    {
-      key: 'explanation',
-      label: 'Explanation depth',
-      levels: [
-        { id: 'brief', label: 'Brief' },
-        { id: 'detailed', label: 'Detailed' },
-      ],
-    },
-  ],
   questionBanks,
   questions: allQuestions,
 };

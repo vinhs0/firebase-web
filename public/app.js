@@ -619,7 +619,7 @@ function getProgressModel() {
 
   return { current: totalSteps, total: totalSteps, label: 'Completed' };
 }
-
+/**main render() function */
 function render() {
   const progress = getProgressModel();
 
@@ -678,15 +678,15 @@ function render() {
 
   appRoot.insertAdjacentHTML('beforeend', renderComplete());
 }
-
+/**Render the declined page if the user decided not to participate in this experiment.*/
 function renderDeclined() {
   return `
     <section class="surface surface-content">
-      <p class="summary-copy">${experimentContent.intro.declineCopy}</p>
+      <p class="summary-copy">You have chosen not to participate in this experiment. Please reload to go back to the main page.</p>
     </section>
   `;
 }
-
+/**Stop the experiment immediately*/
 function renderStopped() {
   return `
     <section class="surface surface-content">
@@ -705,24 +705,33 @@ function renderStopped() {
     </section>
   `;
 }
-
+/**Everything at the Starting page (Consent)*/
 function renderConsent() {
   return `
     <section class="hero-grid">
       <article class="surface surface-content">
-        <p class="eyebrow">${experimentContent.intro.eyebrow}</p>
-        <h2>${experimentContent.intro.title}</h2>
+        <p class="eyebrow">Study information & Consent</p>
+
+        <h2>An environment simulating AI-assisted tasks</h2>
+
         <div class="summary-copy"> 
-          <p>Thank you for taking part in this study. This research is conducted as part of a project aimed at developing and improving an AI-assisted decision support program for educational settings.</p>
-          
-          <p>We are currently in the testing phase and need your input to understand how the program is used across different types of tasks and users.</p>
+          <p>
+            Thank you for taking part in this study. This research is conducted as part of a project aimed at 
+            developing and improving an AI-assisted decision support program for educational settings.
+          </p>
+          <p>
+            We are currently in the testing phase and need your input to understand how the program 
+            is used across different types of tasks and users.
+          </p>
         </div>
+
         <article>
           <div class="accordion-container">
             
             <details class="accordion-item" open>
               <summary><strong>What you will do</strong></summary>
               <p class="summary-copy">This study consists of two parts:</p>
+
               <p class="summary-copy"><strong><em>1. Task section</em></strong></p>
 
               <p class="summary-copy-copy">You will work through a series of short reasoning and judgment tasks related to educational scenarios. For each task, you will select the answer that best reflects your own thinking.</p>
@@ -780,7 +789,7 @@ function renderConsent() {
         <div class="consent-block">
           <label class="checkbox-row">
             <input id="consent-checkbox" type="checkbox" />
-            <span>${experimentContent.intro.consentLabel}</span>
+            <span>I agree and continue.</span>
           </label>
           <p>Start the experiment?</p>
           <div class="action-row">
@@ -797,7 +806,7 @@ function renderConsent() {
     </section>
   `;
 }
-
+/**A survey part right after renderConsent()*/
 function renderAttitudeSurvey() {
   const content = experimentContent.attitudeSurvey;
   const answers = state.attitudeSurvey.answers;
@@ -859,7 +868,7 @@ function renderAttitudeSurvey() {
     </section>
   `;
 }
-
+/**Renders the main part of this experiments - the questions.*/
 function renderQuestion() {
   const question = getCurrentQuestion();
 
@@ -1180,7 +1189,7 @@ function renderQuestion() {
     </section>
   `;
 }
-
+/**Helper function for renderSurvey()*/
 function startSurveyTimer() {
   const REQUIRED_WAIT_MS = 60000; // 60 seconds
   if (surveyTimer) clearInterval(surveyTimer);
@@ -1208,7 +1217,7 @@ function startSurveyTimer() {
     }
   }, 1000);
 }
-
+/**Renders the questionnaire page */
 function renderSurvey() {
   const hasEmbed = Boolean(runtimeConfig.survey.embedUrl);
   const hasFallback = Boolean(runtimeConfig.survey.fallbackUrl);
@@ -1295,19 +1304,13 @@ function renderSurvey() {
     </section>
   `;
 }
-
+/**Renders the final page */
 function renderComplete() {
-  const answeredCount = state.questionOrder.filter(
-    (questionId) => state.answers[questionId]?.selectedOptionId,
-  ).length;
-  const aiChecks = state.questionOrder.filter((questionId) => state.answers[questionId]?.aiChecked)
-    .length;
-
   return `
     <section class="surface complete-card">
       <div class="section-heading">
         <p class="section-kicker">Completed</p>
-        <h2>${experimentContent.complete.title}</h2>
+        <h2>Thank you for participating</h2>
       </div>
       <div class="summary-copy">
         <p>Thank you for completing the study.</p>
