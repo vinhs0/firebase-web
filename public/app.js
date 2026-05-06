@@ -344,6 +344,7 @@ function buildSnapshotPayload() {
     questionOrder: state.questionOrder,
     difficultyLevel: state.difficultyLevel,
     difficultyAssignedAt: state.difficultyAssignedAt,
+    attitudeSurvey: state.attitudeSurvey,
     answers,
     aiCheckCount: Object.values(state.answers).filter((entry) => entry.aiChecked).length,
     actionCount: state.sequence,
