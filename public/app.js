@@ -2,7 +2,6 @@ import {
   experimentContent,
   getAiMessages,
   getAllQuestions,
-  // getConditionMatrix,
   getQuestionsByDifficulty,
 } from './experiment-content.js';
 import {
@@ -22,7 +21,6 @@ import {
 } from './shared.js';
 
 const STATE_VERSION = 3;
-// const conditionMatrix = getConditionMatrix();
 const allQuestions = getAllQuestions();
 const questionCountPerDifficulty = getQuestionsByDifficulty('wdl').length;
 const questionsById = Object.fromEntries(allQuestions.map((question) => [question.id, question]));
@@ -57,17 +55,6 @@ function renderStageAndFocus(smooth = true) {
 
   const selector = selectorByStage[state.currentStage] ?? '.progress-card';
 
-  // const stopBtn = document.querySelector('#global-stop-btn');
-  // if (stopBtn) {
-  //   const hiddenStages = ['intro', 'consent', 'complete', 'stopped', 'declined'];
-    
-  //   if (hiddenStages.includes(state.currentStage)) {
-  //     stopBtn.style.display = 'none';
-  //   } else {
-  //     stopBtn.style.display = 'block'; // Shows the button on middle stages
-  //   }
-  // }
-
   requestAnimationFrame(() => {
     const element = document.querySelector(selector) ?? document.querySelector('.progress-card');
 
@@ -99,10 +86,6 @@ async function boot() {
   } else if (!isFirebaseEnabled()) {
     setSyncStatus('idle', 'Local');
   }
-
-  // if (state.currentStage === 'question') {
-  //   ensureQuestionViewLogged();
-  // }
 
   if (state.currentStage === 'survey' && !state.survey.startedAt) {
     state.survey.startedAt = Date.now();
@@ -141,8 +124,6 @@ function createBlankState() {
     consentedAt: null,
     hasConsented: false,
     declined: false,
-    // conditionId: null,
-    // conditionValues: {},
     difficultyLevel: null,
     difficultyAssignedAt: null,
     questionOrder: [],
@@ -221,40 +202,6 @@ function setSyncStatus(mode, message) {
   syncStatus.dataset.state = normalizedMode;
   syncStatus.textContent = message;
 }
-
-// function initializeParticipantSession() {
-//   const condition = chooseRandomItem(conditionMatrix);
-//   const difficultyLevel = chooseRandomItem(Object.keys(experimentContent.questionBanks));
-//   const questionOrder = getQuestionsByDifficulty(difficultyLevel).map((question) => question.id);
-//   const freshState = createBlankState();
-//   const now = Date.now();
-
-//   state = {
-//     ...freshState,
-//     sessionInitialized: true,
-//     participantId: generateParticipantId(difficultyLevel),
-//     createdAt: now,
-//     consentedAt: now,
-//     hasConsented: true,
-//     conditionId: condition.id,
-//     conditionValues: clone(condition.values),
-//     difficultyLevel,
-//     difficultyAssignedAt: now,
-//     questionOrder,
-//     currentStage: 'attitude-survey',
-//   };
-
-//   recordEvent('participant_initialized', {
-//     difficultyLevel,
-//     questionOrder,
-//   });
-//   recordEvent('consent_granted');
-//   recordEvent('difficulty_assigned', { difficultyLevel });
-//   // ensureQuestionViewLogged();
-//   persistState();
-//   renderStageAndFocus();
-//   void syncParticipantState();
-// }
 
 function initializeParticipantSession() {
   const validDifficulties = Object.keys(experimentContent.questionBanks);
@@ -392,8 +339,6 @@ function buildSnapshotPayload() {
     completedAt: state.completedAt,
     surveyAcknowledgedAt: state.survey.acknowledgedAt,
     lastUpdatedAt: state.lastUpdatedAt ?? Date.now(),
-    // conditionId: state.conditionId,
-    // conditionValues: state.conditionValues,
     currentStage: state.currentStage,
     currentQuestionIndex: state.currentQuestionIndex,
     questionOrder: state.questionOrder,
@@ -928,8 +873,6 @@ function renderQuestion() {
 
   const answerState = state.answers[question.id];
   
-  // FIX 1: We now generate the AI messages as soon as the user selects an option.
-  // This ensures the text is ready to be rendered during the middle animation phase!
   const aiMessages = answerState.selectedOptionId
     ? getAiMessages(question.id, answerState.selectedOptionId, state.conditionId)
     : [];

@@ -1,40 +1,3 @@
-import { buildConditionMatrix } from './shared.js';
-
-// const scriptedConditionGroups = {
-//   minimal: [
-//     'agreement-agree__explanation-brief',
-//     'agreement-neutral__explanation-brief',
-//   ],
-//   elaborated: [
-//     'agreement-agree__explanation-detailed',
-//     'agreement-neutral__explanation-detailed',
-//   ],
-// };
-
-// function expandResponseConditions(selectedAnswerMap) {
-//   const conditionResponses = {};
-
-//   scriptedConditionGroups.minimal.forEach((conditionId) => {
-//     conditionResponses[conditionId] = Object.fromEntries(
-//       Object.entries(selectedAnswerMap).map(([optionId, content]) => [
-//         optionId,
-//         [{ role: 'ai', text: content.minimal }],
-//       ]),
-//     );
-//   });
-
-//   scriptedConditionGroups.elaborated.forEach((conditionId) => {
-//     conditionResponses[conditionId] = Object.fromEntries(
-//       Object.entries(selectedAnswerMap).map(([optionId, content]) => [
-//         optionId,
-//         [{ role: 'ai', text: content.elaborated }],
-//       ]),
-//     );
-//   });
-
-//   return conditionResponses;
-// }
-
 // WDL: Well-defined + low difficulty
 const wdlQuestions = [
   {
@@ -339,153 +302,6 @@ const idhQuestions = [
   },
 ];
 
-// const scriptedResponseTables = {
-//   wdl1: {
-//     A: { minimal: "I can see why you chose that. You focused on how Program B's results compared to Program A's.", elaborated: "I can see why you chose that. You focused on how Program B's results compared to Program A's." },
-//     B: { minimal: "I can see why you chose that. You focused on how Program A's results compared to Program B's.", elaborated: "I can see why you chose that. You focused on how Program A's results compared to Program B's." },
-//     C: { minimal: "I can see why you chose that. You focused on whether the difference between the two programs was significant.", elaborated: "I can see why you chose that. You focused on whether the difference between the two programs was significant." },
-//     D: { minimal: "I can see why you chose that. You focused on whether the data was enough to draw a firm conclusion.", elaborated: "I can see why you chose that. You focused on whether the data was enough to draw a firm conclusion." },
-//   },
-//   wdl2: {
-//     A: { minimal: "That's a reasonable interpretation. You focused on Classroom A's performance and how it compared to the others.", elaborated: "That's a reasonable interpretation. You focused on Classroom A's performance and how it compared to the others." },
-//     B: { minimal: "That's a reasonable interpretation. You focused on Classroom B's performance and how it compared to the others.", elaborated: "That's a reasonable interpretation. You focused on Classroom B's performance and how it compared to the others." },
-//     C: { minimal: "That's a reasonable interpretation. You focused on Classroom C's performance and how it compared to the others.", elaborated: "That's a reasonable interpretation. You focused on Classroom C's performance and how it compared to the others." },
-//     D: { minimal: "That's a reasonable interpretation. You focused on Classroom D's performance and how it compared to the others.", elaborated: "That's a reasonable interpretation. You focused on Classroom D's performance and how it compared to the others." },
-//   },
-//   wdl3: {
-//     A: { minimal: "That seems like a reasonable conclusion. You looked at Group A's score and weighed it against the others.", elaborated: "That seems like a reasonable conclusion. You looked at Group A's score and weighed it against the others." },
-//     B: { minimal: "That seems like a reasonable conclusion. You looked at Group B's score and weighed it against the others.", elaborated: "That seems like a reasonable conclusion. You looked at Group B's score and weighed it against the others." },
-//     C: { minimal: "That seems like a reasonable conclusion. You looked at Group C's score and weighed it against the others.", elaborated: "That seems like a reasonable conclusion. You looked at Group C's score and weighed it against the others." },
-//     D: { minimal: "That seems like a reasonable conclusion. You looked at Group D's score and weighed it against the others.", elaborated: "That seems like a reasonable conclusion. You looked at Group D's score and weighed it against the others." },
-//   },
-//   wdl4: {
-//     A: { minimal: "I can see how you arrived at that. You evaluated Program A against the success criterion and made your judgment.", elaborated: "I can see how you arrived at that. You evaluated Program A against the success criterion and made your judgment." },
-//     B: { minimal: "I can see how you arrived at that. You evaluated Program B against the success criterion and made your judgment.", elaborated: "I can see how you arrived at that. You evaluated Program B against the success criterion and made your judgment." },
-//     C: { minimal: "I can see how you arrived at that. You considered both programs in relation to the success criterion.", elaborated: "I can see how you arrived at that. You considered both programs in relation to the success criterion." },
-//     D: { minimal: "I can see how you arrived at that. You questioned whether either program fully met the success criterion.", elaborated: "I can see how you arrived at that. You questioned whether either program fully met the success criterion." },
-//   },
-//   wdl5: {
-//     A: { minimal: "That interpretation fits the situation. You compared the attendance rates and identified Month 3 as standing out.", elaborated: "That interpretation fits the situation. You compared the attendance rates and identified Month 3 as standing out." },
-//     B: { minimal: "That interpretation fits the situation. You compared the attendance rates and identified Month 2 as standing out.", elaborated: "That interpretation fits the situation. You compared the attendance rates and identified Month 2 as standing out." },
-//     C: { minimal: "That interpretation fits the situation. You compared the attendance rates and identified Month 1 as standing out.", elaborated: "That interpretation fits the situation. You compared the attendance rates and identified Month 1 as standing out." },
-//     D: { minimal: "That interpretation fits the situation. You considered whether the data provided enough information to make a comparison.", elaborated: "That interpretation fits the situation. You considered whether the data provided enough information to make a comparison." },
-//   },
-//   wdl6: {
-//     A: { minimal: "Looking at it that way makes sense. You looked at Week 1's submissions and compared it against the other weeks.", elaborated: "Looking at it that way makes sense. You looked at Week 1's submissions and compared it against the other weeks." },
-//     B: { minimal: "Looking at it that way makes sense. You looked at Week 2's submissions and compared it against the other weeks.", elaborated: "Looking at it that way makes sense. You looked at Week 2's submissions and compared it against the other weeks." },
-//     C: { minimal: "Looking at it that way makes sense. You looked at Week 3's submissions and compared it against the other weeks.", elaborated: "Looking at it that way makes sense. You looked at Week 3's submissions and compared it against the other weeks." },
-//     D: { minimal: "Looking at it that way makes sense. You looked at Week 4's submissions and compared it against the other weeks.", elaborated: "Looking at it that way makes sense. You looked at Week 4's submissions and compared it against the other weeks." },
-//   },
-//   wdh1: {
-//     A: { minimal: "I agree with that. You focused on the proportion of students who improved in Program A and used that to make your judgment.", elaborated: "I agree with that. You focused on the proportion of students who improved in Program A and used that to make your judgment." },
-//     B: { minimal: "I agree with that. You focused on the proportion of students who improved in Program B and used that to make your judgment.", elaborated: "I agree with that. You focused on the proportion of students who improved in Program B and used that to make your judgment." },
-//     C: { minimal: "I agree with that. You considered whether the two programs were comparable in terms of their overall results.", elaborated: "I agree with that. You considered whether the two programs were comparable in terms of their overall results." },
-//     D: { minimal: "I agree with that. You thought carefully about whether the available information was sufficient to make a clear judgment.", elaborated: "I agree with that. You thought carefully about whether the available information was sufficient to make a clear judgment." },
-//   },
-//   wdh2: {
-//     A: { minimal: "That makes sense. You identified Class C's performance and evaluated it against the given condition.", elaborated: "That makes sense. You identified Class C's performance and evaluated it against the given condition." },
-//     B: { minimal: "That makes sense. You identified Class D's performance and evaluated it against the given condition.", elaborated: "That makes sense. You identified Class D's performance and evaluated it against the given condition." },
-//     C: { minimal: "That makes sense. You identified Class E's performance and evaluated it against the given condition.", elaborated: "That makes sense. You identified Class E's performance and evaluated it against the given condition." },
-//     D: { minimal: "That makes sense. You identified Class F's performance and evaluated it against the given condition.", elaborated: "That makes sense. You identified Class F's performance and evaluated it against the given condition." },
-//   },
-//   wdh3: {
-//     A: { minimal: "I can see that. You evaluated Group A against the given conditions and reached your conclusion.", elaborated: "I can see that. You evaluated Group A against the given conditions and reached your conclusion." },
-//     B: { minimal: "I can see that. You evaluated Group B against the given conditions and reached your conclusion.", elaborated: "I can see that. You evaluated Group B against the given conditions and reached your conclusion." },
-//     C: { minimal: "I can see that. You evaluated Group C against the given conditions and reached your conclusion.", elaborated: "I can see that. You evaluated Group C against the given conditions and reached your conclusion." },
-//     D: { minimal: "I can see that. You evaluated Group D against the given conditions and reached your conclusion.", elaborated: "I can see that. You evaluated Group D against the given conditions and reached your conclusion." },
-//   },
-//   wdh4: {
-//     A: { minimal: "That seems right. You checked Program A against the success conditions and made your judgment.", elaborated: "That seems right. You checked Program A against the success conditions and made your judgment." },
-//     B: { minimal: "That seems right. You checked Program B against the success conditions and made your judgment.", elaborated: "That seems right. You checked Program B against the success conditions and made your judgment." },
-//     C: { minimal: "That seems right. You considered both programs in relation to the success conditions and made your judgment.", elaborated: "That seems right. You considered both programs in relation to the success conditions and made your judgment." },
-//     D: { minimal: "That seems right. You worked through each condition carefully before reaching your conclusion.", elaborated: "That seems right. You worked through each condition carefully before reaching your conclusion." },
-//   },
-//   wdh5: {
-//     A: { minimal: "I get why you chose that. You looked at the scores before and after the program and assessed the change.", elaborated: "I get why you chose that. You looked at the scores before and after the program and assessed the change." },
-//     B: { minimal: "I get why you chose that. You looked at the scores before and after the program and assessed the change against the criterion.", elaborated: "I get why you chose that. You looked at the scores before and after the program and assessed the change against the criterion." },
-//     C: { minimal: "I get why you chose that. You looked at the scores before and after the program and questioned whether a real change occurred.", elaborated: "I get why you chose that. You looked at the scores before and after the program and questioned whether a real change occurred." },
-//     D: { minimal: "I get why you chose that. You considered whether the information provided was enough to draw a firm conclusion.", elaborated: "I get why you chose that. You considered whether the information provided was enough to draw a firm conclusion." },
-//   },
-//   wdh6: {
-//     A: { minimal: "I can follow that. You checked each measurement against the definition of consistent improvement and reached your conclusion.", elaborated: "I can follow that. You checked each measurement against the definition of consistent improvement and reached your conclusion." },
-//     B: { minimal: "I can follow that. You examined the pattern across measurements and questioned whether it met the definition.", elaborated: "I can follow that. You examined the pattern across measurements and questioned whether it met the definition." },
-//     C: { minimal: "I can follow that. You looked at the measurements and considered whether a decline could be observed.", elaborated: "I can follow that. You looked at the measurements and considered whether a decline could be observed." },
-//     D: { minimal: "I can follow that. You thought carefully about whether the data was sufficient to support a clear conclusion.", elaborated: "I can follow that. You thought carefully about whether the data was sufficient to support a clear conclusion." },
-//   },
-//   idl1: {
-//     A: { minimal: "I can see why you'd think that. You considered how reinforcing existing knowledge could help the student prepare.", elaborated: "I can see why you'd think that. You considered how reinforcing existing knowledge could help the student prepare." },
-//     B: { minimal: "I can see why you'd think that. You considered how building new problem-solving skills could help the student prepare.", elaborated: "I can see why you'd think that. You considered how building new problem-solving skills could help the student prepare." },
-//     C: { minimal: "I can see why you'd think that. You considered whether combining both approaches could offer a more balanced preparation.", elaborated: "I can see why you'd think that. You considered whether combining both approaches could offer a more balanced preparation." },
-//     D: { minimal: "I can see why you'd think that. You considered that the best approach might vary depending on the student's needs.", elaborated: "I can see why you'd think that. You considered that the best approach might vary depending on the student's needs." },
-//   },
-//   idl2: {
-//     A: { minimal: "That makes sense to me. You considered how maintaining consistent consequences could benefit the classroom.", elaborated: "That makes sense to me. You considered how maintaining consistent consequences could benefit the classroom." },
-//     B: { minimal: "That makes sense to me. You considered how prioritizing student learning could be more supportive in the long run.", elaborated: "That makes sense to me. You considered how prioritizing student learning could be more supportive in the long run." },
-//     C: { minimal: "That makes sense to me. You considered whether a balanced approach could address both discipline and learning.", elaborated: "That makes sense to me. You considered whether a balanced approach could address both discipline and learning." },
-//     D: { minimal: "That makes sense to me. You considered that the right approach might depend on the specific circumstances.", elaborated: "That makes sense to me. You considered that the right approach might depend on the specific circumstances." },
-//   },
-//   idl3: {
-//     A: { minimal: "That seems like a reasonable choice. You thought about how working independently could help maintain control over the outcome.", elaborated: "That seems like a reasonable choice. You thought about how working independently could help maintain control over the outcome." },
-//     B: { minimal: "That seems like a reasonable choice. You thought about how collaborating could bring in different perspectives and improve the result.", elaborated: "That seems like a reasonable choice. You thought about how collaborating could bring in different perspectives and improve the result." },
-//     C: { minimal: "That seems like a reasonable choice. You thought about how combining both approaches could balance independence and teamwork.", elaborated: "That seems like a reasonable choice. You thought about how combining both approaches could balance independence and teamwork." },
-//     D: { minimal: "That seems like a reasonable choice. You thought about how the best approach might depend on the group and the situation.", elaborated: "That seems like a reasonable choice. You thought about how the best approach might depend on the group and the situation." },
-//   },
-//   idl4: {
-//     A: { minimal: "I can see why you'd go with that. You considered how taking on something new could be a valuable opportunity for the student.", elaborated: "I can see why you'd go with that. You considered how taking on something new could be a valuable opportunity for the student." },
-//     B: { minimal: "I can see why you'd go with that. You considered how choosing a familiar subject could make the experience more manageable.", elaborated: "I can see why you'd go with that. You considered how choosing a familiar subject could make the experience more manageable." },
-//     C: { minimal: "I can see why you'd go with that. You considered whether finding a middle ground could work in the student's favor.", elaborated: "I can see why you'd go with that. You considered whether finding a middle ground could work in the student's favor." },
-//     D: { minimal: "I can see why you'd go with that. You considered that the right choice might depend on the student's confidence and goals.", elaborated: "I can see why you'd go with that. You considered that the right choice might depend on the student's confidence and goals." },
-//   },
-//   idl5: {
-//     A: { minimal: "That seems like a fair judgment. You weighed the student's participation as a meaningful indicator of their overall performance.", elaborated: "That seems like a fair judgment. You weighed the student's participation as a meaningful indicator of their overall performance." },
-//     B: { minimal: "That seems like a fair judgment. You weighed the student's test scores as a meaningful indicator of their overall performance.", elaborated: "That seems like a fair judgment. You weighed the student's test scores as a meaningful indicator of their overall performance." },
-//     C: { minimal: "That seems like a fair judgment. You considered that both participation and test scores contribute to a full picture of performance.", elaborated: "That seems like a fair judgment. You considered that both participation and test scores contribute to a full picture of performance." },
-//     D: { minimal: "That seems like a fair judgment. You considered that the evaluation might depend on what criteria the teacher values most.", elaborated: "That seems like a fair judgment. You considered that the evaluation might depend on what criteria the teacher values most." },
-//   },
-//   idl6: {
-//     A: { minimal: "I understand why you'd think that. You considered how the potential benefits of the new method could outweigh the challenges of transitioning.", elaborated: "I understand why you'd think that. You considered how the potential benefits of the new method could outweigh the challenges of transitioning." },
-//     B: { minimal: "I understand why you'd think that. You considered how maintaining familiarity and stability could be more beneficial for the school.", elaborated: "I understand why you'd think that. You considered how maintaining familiarity and stability could be more beneficial for the school." },
-//     C: { minimal: "I understand why you'd think that. You considered how a gradual transition could help balance innovation with stability.", elaborated: "I understand why you'd think that. You considered how a gradual transition could help balance innovation with stability." },
-//     D: { minimal: "I understand why you'd think that. You considered that the right decision might depend on the school's specific context and goals.", elaborated: "I understand why you'd think that. You considered that the right decision might depend on the school's specific context and goals." },
-//   },
-//   idh1: {
-//     A: { minimal: "That's a really reasonable way to think about it. You considered how focusing on stronger subjects could help the student maximize their overall performance.", elaborated: "That's a really reasonable way to think about it. You considered how focusing on stronger subjects could help the student maximize their overall performance." },
-//     B: { minimal: "That's a really reasonable way to think about it. You considered how addressing weaker subjects could help the student avoid more serious consequences.", elaborated: "That's a really reasonable way to think about it. You considered how addressing weaker subjects could help the student avoid more serious consequences." },
-//     C: { minimal: "That's a really reasonable way to think about it. You considered whether trying to manage both priorities could lead to a more balanced outcome.", elaborated: "That's a really reasonable way to think about it. You considered whether trying to manage both priorities could lead to a more balanced outcome." },
-//     D: { minimal: "That's a really reasonable way to think about it. You considered that the best approach might depend on what the student values most in this situation.", elaborated: "That's a really reasonable way to think about it. You considered that the best approach might depend on what the student values most in this situation." },
-//   },
-//   idh2: {
-//     A: { minimal: "I can definitely see the reasoning behind that. You considered how applying consistent rules could help maintain fairness across all students.", elaborated: "I can definitely see the reasoning behind that. You considered how applying consistent rules could help maintain fairness across all students." },
-//     B: { minimal: "I can definitely see the reasoning behind that. You considered how accounting for individual circumstances could better support students facing difficulties.", elaborated: "I can definitely see the reasoning behind that. You considered how accounting for individual circumstances could better support students facing difficulties." },
-//     C: { minimal: "I can definitely see the reasoning behind that. You considered whether a balanced approach could address both consistency and flexibility.", elaborated: "I can definitely see the reasoning behind that. You considered whether a balanced approach could address both consistency and flexibility." },
-//     D: { minimal: "I can definitely see the reasoning behind that. You considered that the right approach might depend on how the situation is interpreted.", elaborated: "I can definitely see the reasoning behind that. You considered that the right approach might depend on how the situation is interpreted." },
-//   },
-//   idh3: {
-//     A: { minimal: "That actually makes a lot of sense. You considered how open-ended questions could give students a better opportunity to show their understanding.", elaborated: "That actually makes a lot of sense. You considered how open-ended questions could give students a better opportunity to show their understanding." },
-//     B: { minimal: "That actually makes a lot of sense. You considered how multiple choice questions could make the grading process more consistent and fair.", elaborated: "That actually makes a lot of sense. You considered how multiple choice questions could make the grading process more consistent and fair." },
-//     C: { minimal: "That actually makes a lot of sense. You considered whether combining both formats could balance depth of assessment with consistency.", elaborated: "That actually makes a lot of sense. You considered whether combining both formats could balance depth of assessment with consistency." },
-//     D: { minimal: "That actually makes a lot of sense. You considered that the best format might depend on what the exam is ultimately trying to measure.", elaborated: "That actually makes a lot of sense. You considered that the best format might depend on what the exam is ultimately trying to measure." },
-//   },
-//   idh4: {
-//     A: { minimal: "That's a thoughtful way to look at it. You considered how investing in high-performing students could help the school maximize its overall achievements.", elaborated: "That's a thoughtful way to look at it. You considered how investing in high-performing students could help the school maximize its overall achievements." },
-//     B: { minimal: "That's a thoughtful way to look at it. You considered how supporting struggling students could help reduce gaps and promote fairness.", elaborated: "That's a thoughtful way to look at it. You considered how supporting struggling students could help reduce gaps and promote fairness." },
-//     C: { minimal: "That's a thoughtful way to look at it. You considered whether distributing resources across both groups could lead to a more balanced outcome.", elaborated: "That's a thoughtful way to look at it. You considered whether distributing resources across both groups could lead to a more balanced outcome." },
-//     D: { minimal: "That's a thoughtful way to look at it. You considered that the right allocation might depend on what the school values and prioritizes most.", elaborated: "That's a thoughtful way to look at it. You considered that the right allocation might depend on what the school values and prioritizes most." },
-//   },
-//   idh5: {
-//     A: { minimal: "I can understand that perspective. You considered how the recognition from a well-known company could open doors for the student in the future.", elaborated: "I can understand that perspective. You considered how the recognition from a well-known company could open doors for the student in the future." },
-//     B: { minimal: "I can understand that perspective. You considered how gaining practical experience could help the student build real-world skills more effectively.", elaborated: "I can understand that perspective. You considered how gaining practical experience could help the student build real-world skills more effectively." },
-//     C: { minimal: "I can understand that perspective. You considered whether finding a way to benefit from both opportunities could be the most valuable outcome.", elaborated: "I can understand that perspective. You considered whether finding a way to benefit from both opportunities could be the most valuable outcome." },
-//     D: { minimal: "I can understand that perspective. You considered that the better choice might depend on what the student is hoping to achieve long-term.", elaborated: "I can understand that perspective. You considered that the better choice might depend on what the student is hoping to achieve long-term." },
-//   },
-//   idh6: {
-//     A: { minimal: "That seems like a reasonable way to think about it. You considered how the long-term academic benefits could outweigh the challenges the student is currently facing.", elaborated: "That seems like a reasonable way to think about it. You considered how the long-term academic benefits could outweigh the challenges the student is currently facing." },
-//     B: { minimal: "That seems like a reasonable way to think about it. You considered how prioritizing the student's well-being could be more important than the academic opportunity right now.", elaborated: "That seems like a reasonable way to think about it. You considered how prioritizing the student's well-being could be more important than the academic opportunity right now." },
-//     C: { minimal: "That seems like a reasonable way to think about it. You considered whether accepting with additional support could help the student manage both the opportunity and their current challenges.", elaborated: "That seems like a reasonable way to think about it. You considered whether accepting with additional support could help the student manage both the opportunity and their current challenges." },
-//     D: { minimal: "That seems like a reasonable way to think about it. You considered that the right decision might depend on the student's own sense of what they can handle.", elaborated: "That seems like a reasonable way to think about it. You considered that the right decision might depend on the student's own sense of what they can handle." },
-//   },
-// };
-
 const questionBanks = {
   wdl: wdlQuestions,
   wdh: wdhQuestions,
@@ -499,11 +315,6 @@ export const experimentContent = {
   intro: {
     eyebrow: 'Study information & Consent',
     title: 'An environment simulating AI-assisted tasks',
-    contact: [
-      'Research team: (research team name)',
-      'Email: researcher@example.com',
-      'Lab: Interactive Media Lab',
-    ],
     consentLabel: 'I agree and continue.',
     declineCopy: 'You have chosen not to participate in this survey.',
   },
@@ -561,12 +372,6 @@ export const experimentContent = {
   ],
   questionBanks,
   questions: allQuestions,
-  // customResponses: Object.fromEntries(
-  //   Object.entries(scriptedResponseTables).map(([questionId, selectedAnswerMap]) => [
-  //     questionId,
-  //     expandResponseConditions(selectedAnswerMap),
-  //   ]),
-  // ),
 };
 
 const questionsById = Object.fromEntries(allQuestions.map((question) => [question.id, question]));
@@ -581,8 +386,7 @@ export function getAiMessages(questionId, optionId) {
   if (!question || !selectedOption) {
     return [{ role: 'ai', text: 'No response available.' }];
   }
-
-  // The AI now simply uses the 'rationale' directly from your option definitions!
+  
   return [
     { role: 'ai', text: `${selectedOption.rationale}` }
   ];
