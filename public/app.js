@@ -222,10 +222,45 @@ function setSyncStatus(mode, message) {
   syncStatus.textContent = message;
 }
 
+// function initializeParticipantSession() {
+//   const condition = chooseRandomItem(conditionMatrix);
+//   const difficultyLevel = chooseRandomItem(Object.keys(experimentContent.questionBanks));
+//   const questionOrder = getQuestionsByDifficulty(difficultyLevel).map((question) => question.id);
+//   const freshState = createBlankState();
+//   const now = Date.now();
+
+//   state = {
+//     ...freshState,
+//     sessionInitialized: true,
+//     participantId: generateParticipantId(difficultyLevel),
+//     createdAt: now,
+//     consentedAt: now,
+//     hasConsented: true,
+//     conditionId: condition.id,
+//     conditionValues: clone(condition.values),
+//     difficultyLevel,
+//     difficultyAssignedAt: now,
+//     questionOrder,
+//     currentStage: 'attitude-survey',
+//   };
+
+//   recordEvent('participant_initialized', {
+//     difficultyLevel,
+//     questionOrder,
+//   });
+//   recordEvent('consent_granted');
+//   recordEvent('difficulty_assigned', { difficultyLevel });
+//   // ensureQuestionViewLogged();
+//   persistState();
+//   renderStageAndFocus();
+//   void syncParticipantState();
+// }
+
 function initializeParticipantSession() {
-  const condition = chooseRandomItem(conditionMatrix);
-  const difficultyLevel = chooseRandomItem(Object.keys(experimentContent.questionBanks));
-  const questionOrder = getQuestionsByDifficulty(difficultyLevel).map((question) => question.id);
+  const validDifficulties = Object.keys(experimentContent.questionBanks);
+  const difficultyLevel = chooseRandomItem(validDifficulties);
+
+  const questionOrder = getQuestionsByDifficulty(difficultyLevel).map((q) => q.id);
   const freshState = createBlankState();
   const now = Date.now();
 
@@ -236,21 +271,16 @@ function initializeParticipantSession() {
     createdAt: now,
     consentedAt: now,
     hasConsented: true,
-    conditionId: condition.id,
-    conditionValues: clone(condition.values),
     difficultyLevel,
     difficultyAssignedAt: now,
     questionOrder,
     currentStage: 'attitude-survey',
   };
 
-  recordEvent('participant_initialized', {
-    difficultyLevel,
-    questionOrder,
-  });
+  recordEvent('participant_initialized', { difficultyLevel, questionOrder });
   recordEvent('consent_granted');
   recordEvent('difficulty_assigned', { difficultyLevel });
-  // ensureQuestionViewLogged();
+  
   persistState();
   renderStageAndFocus();
   void syncParticipantState();
