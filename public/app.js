@@ -2,7 +2,7 @@ import {
   experimentContent,
   getAiMessages,
   getAllQuestions,
-  getConditionMatrix,
+  // getConditionMatrix,
   getQuestionsByDifficulty,
 } from './experiment-content.js';
 import {
@@ -22,7 +22,7 @@ import {
 } from './shared.js';
 
 const STATE_VERSION = 3;
-const conditionMatrix = getConditionMatrix();
+// const conditionMatrix = getConditionMatrix();
 const allQuestions = getAllQuestions();
 const questionCountPerDifficulty = getQuestionsByDifficulty('wdl').length;
 const questionsById = Object.fromEntries(allQuestions.map((question) => [question.id, question]));
@@ -100,9 +100,9 @@ async function boot() {
     setSyncStatus('idle', 'Local');
   }
 
-  if (state.currentStage === 'question') {
-    ensureQuestionViewLogged();
-  }
+  // if (state.currentStage === 'question') {
+  //   ensureQuestionViewLogged();
+  // }
 
   if (state.currentStage === 'survey' && !state.survey.startedAt) {
     state.survey.startedAt = Date.now();
@@ -141,8 +141,8 @@ function createBlankState() {
     consentedAt: null,
     hasConsented: false,
     declined: false,
-    conditionId: null,
-    conditionValues: {},
+    // conditionId: null,
+    // conditionValues: {},
     difficultyLevel: null,
     difficultyAssignedAt: null,
     questionOrder: [],
@@ -392,8 +392,8 @@ function buildSnapshotPayload() {
     completedAt: state.completedAt,
     surveyAcknowledgedAt: state.survey.acknowledgedAt,
     lastUpdatedAt: state.lastUpdatedAt ?? Date.now(),
-    conditionId: state.conditionId,
-    conditionValues: state.conditionValues,
+    // conditionId: state.conditionId,
+    // conditionValues: state.conditionValues,
     currentStage: state.currentStage,
     currentQuestionIndex: state.currentQuestionIndex,
     questionOrder: state.questionOrder,
@@ -717,6 +717,12 @@ function render() {
   if (state.currentStage === 'survey') {
     appRoot.insertAdjacentHTML('beforeend', renderSurvey());
     startSurveyTimer();
+
+    const modal = document.getElementById('user-id-modal');
+    if (modal && !modal.open) {
+      modal.showModal();
+    }
+
     return;
   }
 
@@ -776,6 +782,7 @@ function renderConsent() {
 
               <p class="summary-copy-copy">You will work through a series of short reasoning and judgment tasks related to educational scenarios. For each task, you will select the answer that best reflects your own thinking.</p>
               <p class="summary-copy-copy">After each answer, KAI — the AI assistant being evaluated — will provide a brief response. Please read KAI's response carefully before moving on to the next task.</p>
+              <p class="summary-copy-copy">Before moving to the questionnaire section, you will receive an anonymous participant ID that you will need to enter on the next page.</p>
 
               <p class="summary-copy"><strong><em>2. Questionnaire</em></strong></p>
               
@@ -791,12 +798,13 @@ function renderConsent() {
 
             <details class="accordion-item">
               <summary><strong>Confidentiality</strong></summary>
-              <p class="summary-copy">All responses will be kept confidential and used for research purposes only. No personally identifying information will be linked to your responses.</p>
+              <p class="summary-copy">All responses will be kept confidential and used for research purposes only. No personally identifying information, such as your name, student ID, phone number, or email address, will be linked to your responses.</p>
+              <p class="summary-copy">During the study, an anonymous participant ID will be automatically generated. This ID is used only to connect your task responses with your questionnaire responses and does not identify you personally.</p>
             </details>
 
             <details class="accordion-item">
               <summary><strong>Voluntary participation and Risks and discomfort</strong></summary>
-              <p class="summary-copy">There are no known risks beyond those encountered in everyday activities.</p>
+              <p class="summary-copy">There are no known risks beyond those encountered in everyday online surveys or reasoning tasks. Some participants may experience mild fatigue or slight discomfort while completing the tasks.</p>
               <p class="summary-copy">Participation is voluntary. You may stop participating at any time without disadvantage or penalty.</p>
               <p class="summary-copy">Please note that some questions require a response in order to proceed through the study.</p>
             </details>
@@ -1109,7 +1117,7 @@ function renderQuestion() {
             answerState.selectedOptionId
               ? `
                 <div class="chat-bubble user">
-                  I'm leaning towards answer ${answerState.selectedOptionId}: ${
+                  I'm choosing answer ${answerState.selectedOptionId}: ${
                     question.options.find((entry) => entry.id === answerState.selectedOptionId)?.text
                   }
                 </div>
@@ -1175,7 +1183,7 @@ function renderQuestion() {
               ? `
                 ${
                   state.currentQuestionIndex === state.questionOrder.length - 1
-                    ? `<p style="width: 100%; margin: 0 0 4px 0; color: var(--muted); font-size: 0.95rem;">You’ve completed the task section. Next, you will answer a short questionnaire about your experience.</p>`
+                    ? `<p style="width: 100%; margin: 0 0 4px 0; color: var(--muted); font-size: 0.95rem;">You\'ve completed the task section. Next, you will answer a short questionnaire about your experience.</p>`
                     : ''
                 }
                 <button class="button secondary" data-action="advance-question" type="button">
@@ -1250,15 +1258,40 @@ function renderSurvey() {
         <h2>${experimentContent.survey.title}</h2>
       </div>
       <p class="survey-copy">${experimentContent.survey.copy}</p>
-      <div class="participant-code">
-        <span>Your ID: <strong>${state.participantId}</strong></span>
-        <button class="button secondary" data-action="copy-id" type="button" style="padding: 6px 12px; display: flex; align-items: center; gap: 6px; min-height: 32px;" title="Copy ID">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-          </svg>
+      
+        <button 
+          class="button secondary" 
+          type="button" 
+          onclick="document.getElementById('user-id-modal').showModal()"
+        >
+          View & Copy Participant ID
         </button>
-      </div>
+
+      <!-- Native HTML Dialog Pop-up -->
+      <dialog id="user-id-modal" style="padding: 24px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-width: 400px; width: 100%;">
+        <div style="margin-bottom: 16px;">
+          <h3 style="margin-top: 0; margin-bottom: 8px;">Your Participant ID</h3>
+          <p style="margin: 0; color: #64748b; font-size: 0.9em;">
+            Please copy this ID and enter it on the next survey page. This ID is used only to match anonymous responses.
+          </p>
+        </div>
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; padding: 12px 16px; border-radius: 6px; margin-bottom: 24px;">
+          <strong style="font-size: 1.1em; font-family: monospace; letter-spacing: 0.5px;">${state.participantId}</strong>
+          <button class="button secondary" data-action="copy-id" type="button" style="padding: 6px 12px; display: flex; align-items: center; gap: 6px; min-height: 32px;" title="Copy ID">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy
+          </button>
+        </div>
+
+        <form method="dialog" style="display: flex; justify-content: flex-end;">
+          <button class="button primary" type="submit">I have copied my ID</button>
+        </form>
+      </dialog>
+
       ${
         hasEmbed
           ? `<iframe class="survey-frame" src="${runtimeConfig.survey.embedUrl}" title="Final survey"></iframe>`
@@ -1268,6 +1301,7 @@ function renderSurvey() {
             </div>
           `
       }
+      
       <div class="action-row">
         <button 
           id="survey-confirm-btn"
@@ -1278,6 +1312,7 @@ function renderSurvey() {
           ${remainingSec > 0 ? `Please complete the survey` : experimentContent.survey.confirmButton}
         </button>
       </div>
+      
       <div style="margin-top: 12px; padding-bottom: 12px; display: flex; justify-content: flex-start; width: 100%;">
         <button 
           class="button ghost" 
@@ -1347,8 +1382,10 @@ function renderComplete() {
         </p>
 
         <p>
-          All of your responses will be kept strictly confidential and used for research purposes only. 
-          If you wish to withdraw your data after learning about the study's true purpose, please contact the researcher <strong>within two weeks</strong> of completing the study, and your responses will be removed without any consequences.
+          All of your responses will be kept strictly confidential and used for research purposes only.
+        </p>
+        <p>
+          If you wish to withdraw your data after learning about the study\'s full purpose, please contact the researcher <strong>within two weeks</strong> of completing the study and provide <strong>your participant ID</strong>. Your responses will then be removed without any consequences.
         </p>
       </div>
       <div class="summary-copy">
