@@ -136,7 +136,6 @@ function renderTable() {
       return `
         <tr>
           <td>${entry.participantId}</td>
-          <td>${entry.conditionId ?? '—'}</td>
           <td>${entry.difficultyLevel ?? '—'}</td>
           <td>${entry.currentStage ?? '—'}</td>
           <td>${entry.aiCheckCount ?? 0}</td>
