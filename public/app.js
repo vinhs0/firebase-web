@@ -976,11 +976,37 @@ function renderQuestion() {
                 optionClasses.push('selected');
               }
 
-              // --- NEW LOGIC: Locks buttons during intro, or immediately after Ask KAI is pressed ---
+              // --- Lock Logic ---
               const isLocked = !isIntroComplete || answerState.aiLoading || answerState.aiChecked || answerState.completedAt;
 
               if (isLocked) {
                 optionClasses.push('locked');
+              }
+              // --- NEW: Answer Highlight Logic ---
+              // Check if the user has triggered "Ask KAI"
+              const hasCheckedAi = Boolean(answerState.aiRequestedAt || answerState.aiChecked);
+
+              if (hasCheckedAi) {
+                // BETTER WAY: Check the assigned difficulty level directly
+                // Assuming your difficulty levels contain 'id' for ill-defined and 'wd' for well-defined
+                const isIllDefined = state.difficultyLevel.includes('id'); 
+                const isCorrect = option.is_correct === true;
+
+                if (isIllDefined) {
+                  // Ill-defined: Only highlight the user's chosen answer as correct
+                  if (isSelected) {
+                    optionClasses.push('correct-answer');
+                  }
+                } else {
+                  // Well-defined: Single correct answer
+                  if (isSelected && isCorrect) {
+                    optionClasses.push('correct-answer'); // User guessed right
+                  } else if (isSelected && !isCorrect) {
+                    optionClasses.push('wrong-answer');   // User guessed wrong
+                  } else if (!isSelected && isCorrect) {
+                    optionClasses.push('correct-answer'); // Reveal the actual right answer
+                  }
+                }
               }
 
               return `

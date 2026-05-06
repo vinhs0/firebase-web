@@ -343,7 +343,7 @@ export const experimentContent = {
   survey: {
     title: 'Final survey',
     copy:
-      'Before finishing the experiment, you need to complete a Google form. To fill in the Google form, you need to copy your ID into the form.',
+      'For this questionnaire, you MUST enter your ID. DO NOT enter a random string.',
     confirmButton: 'I completed the survey',
     openFallbackButton: 'Open survey in a new tab',
   },
@@ -386,7 +386,7 @@ export function getAiMessages(questionId, optionId) {
   if (!question || !selectedOption) {
     return [{ role: 'ai', text: 'No response available.' }];
   }
-  
+
   return [
     { role: 'ai', text: `${selectedOption.rationale}` }
   ];

@@ -821,3 +821,27 @@ code {
     opacity: 1;
   }
 }
+
+/* Add to styles.css */
+
+.option-card.correct-answer {
+  background-color: #bbf7d0 !important; /* Deeper light green background */
+  border-color: #16a34a !important;     /* Darker green border */
+  color: #14532d !important;            /* Very dark green text */
+}
+
+.option-card.correct-answer .option-badge {
+  background-color: #16a34a !important; /* Matches darker border */
+  color: white !important;
+}
+
+.option-card.wrong-answer {
+  background-color: #fecaca !important; /* Deeper light red background */
+  border-color: #dc2626 !important;     /* Darker red border */
+  color: #7f1d1d !important;            /* Very dark red text */
+}
+
+.option-card.wrong-answer .option-badge {
+  background-color: #dc2626 !important; /* Matches darker border */
+  color: white !important;
+}
