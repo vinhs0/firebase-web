@@ -43,7 +43,7 @@ const wdlQuestions = [
     id: 'wdl1',
     difficulty: 'wdl',
     prompt:
-      'Two after-school tutoring programs were evaluated based on the number of students who improved their grades.\n\nUnder <strong>Program A</strong>, 6 out of 10 students improved their grades.\nUnder <strong>Program B</strong>, 8 out of 10 students improved their grades.\n\nWhich conclusion is best supported by the data?',
+      'A school district piloted two after-school tutoring programs over one semester to help students who had been falling behind in core subjects. At the end of the semester, evaluators reviewed how many students in each program showed a measurable improvement in their grades.\n\nUnder <strong>Program A</strong>, 6 out of 10 students improved their grades.\nUnder <strong>Program B</strong>, 8 out of 10 students improved their grades.\n\nBoth programs ran for the same number of weeks, with the same number of sessions per week, and served students from similar academic backgrounds. The district now wants to determine which program was more effective based solely on grade improvement rates.\nWhich conclusion is best supported by the data?',
     options: [
       { id: 'A', text: 'Program B led to greater grade improvement than Program A', rationale: "focused on how Program B's results compared to Program A's" },
       { id: 'B', text: 'Program A led to greater grade improvement than Program B', rationale: "focused on how Program A's results compared to Program B's" },

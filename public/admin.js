@@ -1,7 +1,6 @@
 import { runtimeConfig } from './firebase-config.js';
 import {
   fetchAllParticipants,
-  fetchParticipantEvents,
   isFirebaseEnabled,
   signInAdmin,
   signOutCurrentUser,
@@ -19,13 +18,14 @@ const tableBody = document.querySelector('#participants-table-body');
 const refreshButton = document.querySelector('#refresh-admin');
 const signoutButton = document.querySelector('#signout-admin');
 const exportSummaryButton = document.querySelector('#export-summary');
+
+// Grab the other buttons so we can hide them automatically
 const exportEventsButton = document.querySelector('#export-events');
 const exportJsonButton = document.querySelector('#export-json');
 
 emailField.placeholder = runtimeConfig.adminEmailHint;
 
 let participants = [];
-let cachedEvents = new Map();
 
 loginForm.addEventListener('submit', handleLogin);
 refreshButton.addEventListener('click', () => {
@@ -34,23 +34,20 @@ refreshButton.addEventListener('click', () => {
 signoutButton.addEventListener('click', async () => {
   await signOutCurrentUser();
   participants = [];
-  cachedEvents = new Map();
   renderMetrics();
   renderTable();
   dashboard.classList.add('hidden');
   authStatus.textContent = 'Logged out.';
 });
-exportSummaryButton.addEventListener('click', exportSummary);
-exportEventsButton.addEventListener('click', () => {
-  void exportEvents();
-});
-exportJsonButton.addEventListener('click', () => {
-  void exportJsonBundle();
-});
+
+exportSummaryButton?.addEventListener('click', exportSummary);
+
+// Hide the unused buttons from the UI without needing to edit admin.html
+if (exportEventsButton) exportEventsButton.style.display = 'none';
+if (exportJsonButton) exportJsonButton.style.display = 'none';
 
 if (!isFirebaseEnabled()) {
-  authStatus.textContent =
-    'Let enableFirebaseSync = true to use admin.';
+  authStatus.textContent = 'Let enableFirebaseSync = true to use admin.';
 }
 
 async function handleLogin(event) {
@@ -68,40 +65,59 @@ async function handleLogin(event) {
     dashboard.classList.remove('hidden');
     await refreshDashboard();
   } catch (error) {
-    authStatus.textContent = `Đăng nhập thất bại: ${error.message}`;
+    authStatus.textContent = `Log in failed: ${error.message}`;
   }
 }
 
 async function refreshDashboard() {
-  authStatus.textContent = 'Đang tải dữ liệu participant...';
+  authStatus.textContent = 'Loading participants\' data...';
 
   try {
     participants = await fetchAllParticipants();
-    cachedEvents = new Map();
     renderMetrics();
     renderTable();
-    authStatus.textContent = `Đã tải ${participants.length} participant.`;
+    authStatus.textContent = `Loaded ${participants.length} participant.`;
   } catch (error) {
-    authStatus.textContent = `Không thể tải dữ liệu: ${error.message}`;
+    authStatus.textContent = `ERROR: ${error.message}`;
   }
 }
 
 function renderMetrics() {
-  const completed = participants.filter((entry) => entry.completedAt).length;
-  const interacted = participants.filter((entry) => (entry.aiCheckCount ?? 0) > 0).length;
-  const avgAiChecks =
-    participants.length > 0
-      ? (
-          participants.reduce((sum, entry) => sum + (entry.aiCheckCount ?? 0), 0) /
-          participants.length
-        ).toFixed(2)
-      : '0.00';
+  // 1. Total Participants
+  const totalParticipants = participants.length;
+
+  // 2. Surveys Completed (Participant has a completedAt timestamp)
+  const completedParticipants = participants.filter((entry) => entry.completedAt);
+  const surveysCompleted = completedParticipants.length;
+
+  // 3. Breakdown by Difficulty Level (including 0 counts)
+  const difficultyCounts = {};
+  
+  // Pre-fill all possible difficulty levels with 0
+  if (experimentContent && experimentContent.questionBanks) {
+    Object.keys(experimentContent.questionBanks).forEach((level) => {
+      difficultyCounts[level] = 0;
+    });
+  }
+
+  // Count the actual completions
+  completedParticipants.forEach((entry) => {
+    const level = entry.difficultyLevel;
+    if (level) {
+      // Increment if it exists, or create it if it's somehow unexpected
+      difficultyCounts[level] = (difficultyCounts[level] || 0) + 1;
+    }
+  });
+
+  // Build the HTML for the dynamic difficulty breakdown
+  const difficultyCardsHTML = Object.entries(difficultyCounts)
+    .map(([level, count]) => metricCard(`Completed (${level})`, String(count)))
+    .join('');
 
   metrics.innerHTML = [
-    metricCard('Participants', String(participants.length)),
-    metricCard('Completed', String(completed)),
-    metricCard('Any AI check', String(interacted)),
-    metricCard('Avg AI checks', avgAiChecks),
+    metricCard('Total Participants', String(totalParticipants)),
+    metricCard('Surveys Completed', String(surveysCompleted)),
+    difficultyCardsHTML, // Append the breakdown cards
   ].join('');
 }
 
@@ -133,34 +149,28 @@ function renderTable() {
 
 function buildSummaryRows() {
   return participants.map((entry) => {
+    // 1. Initialize the row with the exact base columns matching the Excel file
     const row = {
       participantId: entry.participantId,
-      conditionId: entry.conditionId,
-      difficultyLevel: entry.difficultyLevel,
-      currentStage: entry.currentStage,
-      actionCount: entry.actionCount,
-      aiCheckCount: entry.aiCheckCount,
-      createdAt: formatDateTime(entry.createdAt),
-      consentedAt: formatDateTime(entry.consentedAt),
-      completedAt: formatDateTime(entry.completedAt),
-      surveyAcknowledgedAt: formatDateTime(entry.surveyAcknowledgedAt),
+      difficultyLevel: entry.difficultyLevel ?? '',
     };
 
-    row['att1_impression'] = entry.attitudeSurvey?.answers?.att1 ?? '';
-    row['att2_comfortable'] = entry.attitudeSurvey?.answers?.att2 ?? '';
-    row['att3_favorable'] = entry.attitudeSurvey?.answers?.att3 ?? '';
-    row['att4_interested'] = entry.attitudeSurvey?.answers?.att4 ?? '';
-    row['att5_exciting'] = entry.attitudeSurvey?.answers?.att5 ?? '';
-    row['att6_beneficial'] = entry.attitudeSurvey?.answers?.att6 ?? ''; 
+    // 2. Add Attitude Survey answers (attitudeSurvey_1 to attitudeSurvey_6)
+    // We safely pull the question IDs from experimentContent to find their answers
+    const attitudeQuestions = experimentContent?.attitudeSurvey?.questions || [];
+    for (let i = 0; i < 6; i++) {
+      const qId = attitudeQuestions[i]?.id || String(i + 1);
+      row[`attitudeSurvey_${i + 1}`] = entry.attitudeSurvey?.answers?.[qId] ?? '';
+    }
 
-    experimentContent.questions.forEach((question) => {
-      const answer = entry.answers?.[question.id] ?? {};
-      row[`${question.id}_answer`] = answer.selectedOptionId ?? '';
-      row[`${question.id}_ai_checked`] = answer.aiChecked ?? false;
-      row[`${question.id}_skipped_ai`] = answer.skippedAi ?? false;
-      row[`${question.id}_answer_duration_ms`] = answer.answerDurationMs ?? '';
-      row[`${question.id}_total_duration_ms`] = answer.totalDurationMs ?? '';
-    });
+    // 3. Add Task answers (Q1 to Q6)
+    // We use entry.questionOrder to ensure we get the answers in the exact sequence they were shown
+    const qOrder = entry.questionOrder || [];
+    for (let i = 0; i < 6; i++) {
+      const qId = qOrder[i];
+      const answer = qId ? (entry.answers?.[qId] ?? {}) : {};
+      row[`Q${i + 1}`] = answer.selectedOptionId ?? '';
+    }
 
     return row;
   });
@@ -169,57 +179,4 @@ function buildSummaryRows() {
 function exportSummary() {
   const csv = toCsv(buildSummaryRows());
   downloadFile('participant-summary.csv', csv, 'text/csv;charset=utf-8');
-}
-
-async function ensureEventsLoaded() {
-  await Promise.all(
-    participants.map(async (entry) => {
-      if (!cachedEvents.has(entry.participantId)) {
-        const events = await fetchParticipantEvents(entry.participantId);
-        cachedEvents.set(entry.participantId, events);
-      }
-    }),
-  );
-}
-
-async function exportEvents() {
-  authStatus.textContent = 'Đang tải event logs...';
-  await ensureEventsLoaded();
-
-  const rows = participants.flatMap((entry) => {
-    const events = cachedEvents.get(entry.participantId) ?? [];
-
-    return events.map((event) => ({
-      participantId: entry.participantId,
-      difficultyLevel: entry.difficultyLevel ?? '',
-      sequence: event.sequence,
-      type: event.type,
-      stage: event.stage,
-      timestamp: formatDateTime(event.timestamp),
-      questionId: event.questionId ?? '',
-      optionId: event.optionId ?? '',
-      skippedAi: event.skippedAi ?? '',
-      totalDurationMs: event.totalDurationMs ?? '',
-    }));
-  });
-
-  downloadFile('participant-events.csv', toCsv(rows), 'text/csv;charset=utf-8');
-  authStatus.textContent = 'Đã export event logs.';
-}
-
-async function exportJsonBundle() {
-  authStatus.textContent = 'Đang chuẩn bị JSON bundle...';
-  await ensureEventsLoaded();
-
-  const bundle = participants.map((entry) => ({
-    participant: entry,
-    events: cachedEvents.get(entry.participantId) ?? [],
-  }));
-
-  downloadFile(
-    'participant-bundle.json',
-    JSON.stringify(bundle, null, 2),
-    'application/json;charset=utf-8',
-  );
-  authStatus.textContent = 'Đã export JSON bundle.';
 }
