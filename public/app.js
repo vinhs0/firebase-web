@@ -732,23 +732,26 @@ function renderConsent() {
         <p class="eyebrow">${experimentContent.intro.eyebrow}</p>
         <h2>${experimentContent.intro.title}</h2>
         <div class="summary-copy"> 
-          <p>Thank you for taking the time to participate in this study. This research aims to better understand how people make decisions and interact with AI systems in everyday tasks.</p>
+          <p>Thank you for taking part in this study. This research is conducted as part of a project aimed at developing and improving an AI-assisted decision support program for educational settings.</p>
           
-          <p>Your responses will help us gain insights into how people use AI to support their thinking and decision-making.</p>
+          <p>We are currently in the testing phase and need your input to understand how the program is used across different types of tasks and users.</p>
         </div>
         <article>
           <div class="accordion-container">
             
             <details class="accordion-item" open>
               <summary><strong>What you will do</strong></summary>
-              <p class="summary-copy">You will complete a short study in two parts:</p>
+              <p class="summary-copy">This study consists of two parts:</p>
               <p class="summary-copy"><strong><em>1. Task section</em></strong></p>
-              <p class="summary-copy-copy">- You will answer a series of short reasoning and decision-making questions.</p>
-              <p class="summary-copy-copy">- For each question, you will first choose an answer based on your own judgment.</p>
-              <p class="summary-copy-copy">- After that, you will see a response from an AI system.</p>
+
+              <p class="summary-copy-copy">You will work through a series of short reasoning and judgment tasks related to educational scenarios. For each task, you will select the answer that best reflects your own thinking.</p>
+              <p class="summary-copy-copy">After each answer, KAI — the AI assistant being evaluated — will provide a brief response. Please read KAI's response carefully before moving on to the next task.</p>
+
               <p class="summary-copy"><strong><em>2. Questionnaire</em></strong></p>
-              <p class="summary-copy-copy">- We kindly ask you to respond as carefully and sincerely as possible.</p>
-              <p class="summary-copy">Please answer based on your own judgment and read the AI\'s response before moving on to the next question.</p>
+              
+              <p class="summary-copy-copy">After completing the tasks, you will fill out a short questionnaire about your experience with the program.</p>
+
+              <p class="summary-copy">Your responses will help us assess how well KAI performs and how it can be improved to better support decision-making in educational contexts.</p>
             </details>
 
             <details class="accordion-item">
@@ -1278,42 +1281,58 @@ function renderComplete() {
         <p>Your responses have been successfully recorded, and your participation is greatly appreciated.</p>
 
         <p>
-          The purpose of this research is to understand how people interact with AI systems, 
-          particularly how AI responses may influence users\' thinking and decision-making.
+          <strong>About this study</strong>
         </p>
 
         <p>
-          During the study, the AI responses you saw were pre-programmed and not generated in real time. 
-          In some cases, the AI was designed to agree with your answer regardless of whether it was correct. 
-          This was done to examine how different types of AI responses may affect users\' reliance on the system. 
-          In particular, this study examines how AI agreement may influence users\' trust in the system and 
-          their reliance on AI rather than their own reasoning.
+          This study was introduced as research aimed at developing an AI-assisted decision support program. 
+          The purpose of this research was to examine how AI agreement influences users\' trust in AI systems and their reliance on AI rather than their own reasoning.
         </p>
 
         <p>
-          Because of this design, the AI responses should not be interpreted as accurate or authoritative 
-          feedback on your answers.
+          <strong>About the AI responses</strong>
         </p>
 
         <p>
-          We understand that this may feel unexpected. Please note that the goal of this study is not to 
-          evaluate your performance, but to better understand how people respond to AI systems in 
-          decision-making situations.
+          During the study, the AI assistant KAI\'s responses were pre-programmed and not generated in real time. 
+          KAI was designed to agree with and validate your answer, regardless of whether it was correct. 
+          This was necessary to examine how AI agreement affects users\' thinking and decision-making under controlled conditions.
         </p>
 
-        <p>All of your responses will be kept confidential and used for research purposes only.</p>
+        <p>
+          Because of this design, KAI's responses should not be interpreted as accurate or authoritative feedback on your answers. 
+          <i>For tasks that had a correct answer, the correct responses are available upon request.</i>
+        </p>
+
+        <p>Please know</p>
 
         <p>
-          If you would like to withdraw your data after learning about the study\'s purpose, 
-          please contact the researcher, and your responses will be removed.
+          The goal of this study was not to evaluate your performance or intelligence. 
+          Being influenced by AI responses is a natural and common human response, and is precisely what this research seeks to understand. 
+          Your responses, whatever they were, have contributed meaningfully to this research.
+        </p>
+
+        <p>
+          Your rights
+        </p>
+
+        <p>
+          All of your responses will be kept strictly confidential and used for research purposes only. 
+          If you wish to withdraw your data after learning about the study's true purpose, please contact the researcher <strong>within two weeks</strong> of completing the study, and your responses will be removed without any consequences.
         </p>
       </div>
       <div class="summary-copy">
         <h3>Contact Information</h3>
-        <p>Nguyen Phuong Ngoc (지원)</p>
+        <p>Researcher: Nguyen Phuong Ngoc (지원)</p>
         <p>
           Email: <a href="mailto:ngocnguyen@ewha.ac.kr" class="email-link">ngocnguyen@ewha.ac.kr</a>
         </p>
+
+        <p>Supervisor: Lim Sohye (임소혜)</p>
+        <p>
+          Email: <a href="mailto:soheilim@gmail.com" class="email-link">soheilim@gmail.com</a>
+        </p>
+        <p>If you have any questions or concerns about this study, please do not hesitate to reach out.</p>
       </div>
       <div class="action-row">
         <button class="button primary" data-action="restart-experiment" type="button">
