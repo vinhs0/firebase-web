@@ -48,7 +48,7 @@ function renderStageAndFocus(smooth = true) {
 
   const selectorByStage = {
     consent: '.hero-grid',
-    question: '.question-card',
+    question: '.progress-card',
     survey: '.survey-card',
     complete: '.complete-card',
   };
@@ -952,7 +952,7 @@ function renderQuestion() {
       });
       
       persistState();
-      setTimeout(() => renderStageAndFocus(false), 0);
+      setTimeout(() => render(), 0);
     }
   }
 
@@ -991,32 +991,6 @@ function renderQuestion() {
 
               if (isLocked) {
                 optionClasses.push('locked');
-              }
-              // --- NEW: Answer Highlight Logic ---
-              // Check if the user has triggered "Ask KAI"
-              const hasCheckedAi = Boolean(answerState.aiRequestedAt || answerState.aiChecked);
-
-              if (hasCheckedAi) {
-                // BETTER WAY: Check the assigned difficulty level directly
-                // Assuming your difficulty levels contain 'id' for ill-defined and 'wd' for well-defined
-                const isIllDefined = state.difficultyLevel.includes('id'); 
-                const isCorrect = option.is_correct === true;
-
-                if (isIllDefined) {
-                  // Ill-defined: Only highlight the user's chosen answer as correct
-                  if (isSelected) {
-                    optionClasses.push('correct-answer');
-                  }
-                } else {
-                  // Well-defined: Single correct answer
-                  if (isSelected && isCorrect) {
-                    optionClasses.push('correct-answer'); // User guessed right
-                  } else if (isSelected && !isCorrect) {
-                    optionClasses.push('wrong-answer');   // User guessed wrong
-                  } else if (!isSelected && isCorrect) {
-                    optionClasses.push('correct-answer'); // Reveal the actual right answer
-                  }
-                }
               }
 
               return `
@@ -1071,17 +1045,17 @@ function renderQuestion() {
                   `
                   : introPhase === 1
                     ? `
-                      <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedback after each task.</div>
+                      <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedbacks after each task.</div>
                       <div class="chat-bubble ai typing">
                         <div class="typing-dots"><span></span><span></span><span></span></div>
                       </div>
                     `
                     : `
-                      <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedback after each task.</div>
+                      <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedbacks after each task.</div>
                       <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing.</div>
                     `
                 : `
-                  <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedback after each task.</div>
+                  <div class="chat-bubble ai">Hi, I'm KAI. I'll provide brief feedbacks after each task.</div>
                   <div class="chat-bubble ai">Please choose your answer first, then read my response before continuing.</div>
                 `
               : !isIntroComplete
@@ -1125,7 +1099,7 @@ function renderQuestion() {
                         <div class="typing-dots"><span></span><span></span><span></span></div>
                       </div>
                     `
-                    : `<div class="chat-bubble ai">Thanks. Here\'s my feedback.</div>`
+                    : `<div class="chat-bubble ai">Thanks! Here\'s my feedback:</div>`
                 }
                 
                 ${
