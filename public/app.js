@@ -1307,7 +1307,11 @@ function renderComplete() {
           <i>For tasks that had a correct answer, the correct responses are available upon request.</i>
         </p>
 
-        <p>Please know</p>
+        <p>
+          <strong>
+            Please know
+          <strong>
+        </p>
 
         <p>
           The goal of this study was not to evaluate your performance or intelligence. 
@@ -1316,7 +1320,9 @@ function renderComplete() {
         </p>
 
         <p>
-          Your rights
+          <strong>
+            Your rights
+          <strong>
         </p>
 
         <p>
