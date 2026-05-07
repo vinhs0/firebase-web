@@ -82,6 +82,20 @@ async function refreshDashboard() {
   }
 }
 
+const passwordInput = document.getElementById('admin-password');
+const toggleBtn = document.getElementById('toggle-password');
+
+if (toggleBtn && passwordInput) {
+  toggleBtn.addEventListener('click', () => {
+    // Toggle the type attribute
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    
+    // Toggle the button text
+    toggleBtn.textContent = type === 'password' ? 'Show' : 'Hide';
+  });
+}
+
 function renderMetrics() {
   // 1. Total Participants
   const totalParticipants = participants.length;

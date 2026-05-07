@@ -862,3 +862,31 @@ code {
   background-color: #dc2626 !important; /* Matches darker border */
   color: white !important;
 }
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 60px; /* Make room for the button */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #8b7d6b; /* Matching your KAI muted brown! */
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.toggle-password:hover {
+  color: #6d5f50;
+}
