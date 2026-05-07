@@ -1310,7 +1310,7 @@ function renderComplete() {
         <p>
           <strong>
             Please know
-          <strong>
+          </strong>
         </p>
 
         <p>
@@ -1322,7 +1322,7 @@ function renderComplete() {
         <p>
           <strong>
             Your rights
-          <strong>
+          </strong>
         </p>
 
         <p>
