@@ -1030,7 +1030,7 @@ function renderQuestion() {
 
       <aside class="surface chat-card">
         <div class="section-heading">
-          <h2>KAI</h2>
+          <h2 class="kai-text">KAI</h2>
         </div>
         <div class="chat-thread">
           ${

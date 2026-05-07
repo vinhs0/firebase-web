@@ -548,7 +548,6 @@ body::before {
   flex-direction: column;
   gap: 18px;
   background:
-    radial-gradient(circle at top right, rgba(15, 118, 110, 0.1), transparent 24%),
     rgba(255, 250, 243, 0.9);
 }
 
@@ -699,7 +698,27 @@ code {
   background: rgba(22, 32, 29, 0.07);
 }
 
+.kai-text {
+  color: rgb(0,0,0);
+}
+
 @media (max-width: 920px) {
+  .kai-text {
+    color: rgb(255,255,255);
+  }
+
+  .chat-bubble.system {
+    color: #000000; /* Muted brownish-grey for the text */
+    background: rgba(255, 255, 255, 0.4); /* Very light semi-transparent white */
+    border: 1px dashed rgba(139, 125, 107, 0.3); /* Soft dashed border in warm tan */
+  }
+
+  .button.secondary {
+    color: #ffffff;
+    background: rgba(180, 83, 9);
+    border: 1px solid rgba(180, 83, 9, 0.18);
+  }
+
   .hero-grid,
   .question-grid,
   .admin-layout {
@@ -710,12 +729,7 @@ code {
   .chat-card {
     min-height: auto;
   }
-}
-
-/* ---------------------------------------------------
-   NEW ADDITION: Forces Chat Box to top on Mobile
-------------------------------------------------------*/
-@media (max-width: 768px) {
+  
   .question-grid {
     display: flex; 
     flex-direction: column; 
@@ -723,6 +737,9 @@ code {
 
   .chat-card {
     order: -1; 
+    background: rgb(36, 36, 36);
+    /* border: 2px solid rgb(0, 0, 0);
+    border-radius: 20px; */
   }
 
   .question-card {
