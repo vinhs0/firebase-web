@@ -1043,6 +1043,14 @@ function renderQuestion() {
           >
             ${experimentContent.quiz.checkButton}
           </button>
+          <button 
+            class="button ghost" 
+            data-action="stop-experiment" 
+            type="button" 
+            style="color: var(--muted); text-decoration: underline;"
+          >
+            Stop the experiment
+          </button>
         </div>
       </article>
 
@@ -1149,13 +1157,6 @@ function renderQuestion() {
                 : ''
           }
         </div>
-        <p class="chat-hint">
-          ${
-            answerState.totalDurationMs
-              ? `Response time: ${formatDuration(answerState.totalDurationMs)}`
-              : ''
-          }
-        </p>
         <div class="chat-action-row">
           ${
             answerState.aiChecked || showFinalMessage
@@ -1177,16 +1178,6 @@ function renderQuestion() {
           }
         </div>
       </aside>
-      <div style="margin-top: 12px; padding-bottom: 12px; display: flex; justify-content: flex-start; width: 100%;">
-        <button 
-          class="button ghost" 
-          data-action="stop-experiment" 
-          type="button" 
-          style="color: var(--muted); text-decoration: underline;"
-        >
-          Stop the experiment
-        </button>
-      </div>
     </section>
   `;
 }
