@@ -41,7 +41,7 @@ export const firebaseConfig = {
 };
 
 export const runtimeConfig = {
-  appName: readString(env.APP_NAME, 'Interactive Media Experiment'),
+  appName: readString(env.APP_NAME, 'KAI Decision Support System'),
   localStorageKey: readString(env.LOCAL_STORAGE_KEY, 'interactive-media-experiment-v1'),
   enableFirebaseSync: readBoolean(env.ENABLE_FIREBASE_SYNC, true),
   adminEmailHint: readString(env.ADMIN_EMAIL_HINT, 'researcher@example.com'),
