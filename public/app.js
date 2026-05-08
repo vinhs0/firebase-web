@@ -822,7 +822,7 @@ function renderAttitudeSurvey() {
       <div class="summary-copy">
         <p>${content.intro}</p>
         <p><strong>${content.instruction}</strong></p>
-        <p>(1 = Strongly agree and 7 = Strongly disagree)</p>
+        <p>(1 = Strongly disagree and 7 = Strongly agree)</p>
       </div>
 
       <div class="attitude-list">
