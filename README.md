@@ -1,6 +1,6 @@
 # KAI Decision Support System
 
-This repository contains a Firebase Hosting app for an online experiment about AI-assisted judgment. Participants do not interact with a real chatbot. Every KAI response is scripted in advance and controlled by the study content in [public/experiment-content.js](/C:/Users/Vinh%20Tran/Desktop/firebase_web/public/experiment-content.js:1).
+This repository contains a Firebase Hosting app for an online experiment about AI-assisted judgment. You can access the page via this link: [ai-qna-9549c.web.app](ai-qna-9549c.web.app)
 
 ## What the app does
 
@@ -59,13 +59,8 @@ The app records:
 - attitude survey responses
 - question order
 - selected option for each task
-- whether KAI feedback was checked
 - answer timing and total question timing
 - current stage and completion timestamps
-- action count and ordered event log
-- basic device metadata such as language, user agent, and viewport
-
-Participant snapshots are written to `participants/{participantId}`. Event-level logs are written to `participants/{participantId}/events/{eventId}`.
 
 ## Project layout
 
@@ -145,8 +140,6 @@ Each bank is an array of questions with this shape:
 
 Right now, the KAI reply is simply the selected option's `rationale`. That behavior is defined in `getAiMessages()`.
 
-If you need different KAI responses by condition, bank, or answer pattern, the place to extend is `getAiMessages(questionId, optionId)` in [public/experiment-content.js](/C:/Users/Vinh%20Tran/Desktop/firebase_web/public/experiment-content.js:350).
-
 ### Bank assignment
 
 Random bank assignment happens in `initializeParticipantSession()` inside [public/app.js](/C:/Users/Vinh%20Tran/Desktop/firebase_web/public/app.js:206). The app currently chooses randomly from `Object.keys(experimentContent.questionBanks)`.
@@ -189,26 +182,9 @@ Current admin features:
 
 The current UI does not expose event CSV or JSON bundle export, even though participant event logs are stored in Firestore.
 
-## Running and deploying
-
-The frontend has no build step. Files in `public/` are served as static assets.
-
-Typical deployment flow:
-
-```bash
-firebase login
-firebase deploy
-```
-
-If local dependencies are missing, restore them with:
-
-```bash
-npm install
-```
-
 ## Notes and limitations
 
-- KAI is scripted. There is no live model call and no free-text participant input.
 - The final survey confirmation button unlocks after a 60-second wait on the survey page.
 - Progress is stored in local storage under `LOCAL_STORAGE_KEY`, so a participant can resume after reload on the same browser.
 - Some older scaffolding around experimental conditions still exists in the codebase, but the active implementation currently randomizes only across the four task banks above.
+- You cannot deploy the project. It is ok to run the code locally on your machine.
