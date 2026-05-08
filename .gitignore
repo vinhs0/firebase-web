@@ -4,4 +4,4 @@ firestore-debug.log
 public/__env.js
 node_modules
 firestore.rules
-public\experiment-content.js
+public/experiment-content.js
