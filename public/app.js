@@ -204,8 +204,15 @@ function setSyncStatus(mode, message) {
 }
 
 function initializeParticipantSession() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const forcedDifficulty = urlParams.get('difficulty');
   const validDifficulties = Object.keys(experimentContent.questionBanks);
-  const difficultyLevel = chooseRandomItem(validDifficulties);
+  
+  let difficultyLevel = (forcedDifficulty && validDifficulties.includes(forcedDifficulty)) 
+    ? forcedDifficulty 
+    : chooseRandomItem(validDifficulties);
+
+  if (forcedDifficulty) console.log(`🔧 [DEV] Difficulty forced via URL: ${difficultyLevel}`);
 
   const questionOrder = getQuestionsByDifficulty(difficultyLevel).map((q) => q.id);
   const freshState = createBlankState();
