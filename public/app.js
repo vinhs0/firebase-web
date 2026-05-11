@@ -339,12 +339,16 @@ function buildSnapshotPayload() {
     completedAt: state.completedAt,
     surveyAcknowledgedAt: state.survey.acknowledgedAt,
     lastUpdatedAt: state.lastUpdatedAt ?? Date.now(),
+    
     currentStage: state.currentStage,
     currentQuestionIndex: state.currentQuestionIndex,
     questionOrder: state.questionOrder,
     difficultyLevel: state.difficultyLevel,
     difficultyAssignedAt: state.difficultyAssignedAt,
     attitudeSurvey: state.attitudeSurvey,
+    
+    rewardContactInfo: state.rewardContactInfo ?? '',
+    
     answers,
     aiCheckCount: Object.values(state.answers).filter((entry) => entry.aiChecked).length,
     actionCount: state.sequence,
@@ -419,6 +423,58 @@ function handleClick(event) {
     persistState();
     renderStageAndFocus();
     void syncParticipantState();
+    return;
+  }
+
+if (action === 'submit-reward-info') {
+    const inputEl = document.getElementById('reward-contact-input');
+    const feedbackEl = document.getElementById('reward-feedback-msg');
+    const contactInfo = inputEl.value.trim();
+
+    if (!contactInfo) {
+      alert("Please enter an email or phone number first.");
+      return;
+    }
+
+    // --- NEW VALIDATION LOGIC ---
+    let isValid = false;
+
+    // 1. Email check: simply verify it contains an '@'
+    if (contactInfo.includes('@')) {
+      isValid = true;
+    } else {
+      // 2. Phone check: Remove hyphens and spaces to check the raw string
+      const rawNumbers = contactInfo.replace(/[\s-]/g, '');
+      
+      // Korean phone numbers start with '0', contain only digits, and are 9-11 characters long
+      const isOnlyDigits = /^\d+$/.test(rawNumbers);
+      const isCorrectLength = rawNumbers.length >= 9 && rawNumbers.length <= 11;
+
+      if (rawNumbers.startsWith('0') && isOnlyDigits && isCorrectLength) {
+        isValid = true;
+      }
+    }
+
+    if (!isValid) {
+      alert("Invalid format. Please enter a valid email containing '@' or a valid Korean phone number.");
+      return;
+    }
+    // ----------------------------
+
+    // 1. Save it to your local state
+    state.rewardContactInfo = contactInfo;
+    persistState();
+
+    // 2. Send an event to Firebase
+    recordEvent('reward_info_submitted', { contactInfo });
+    void syncParticipantState();
+
+    // 3. Show success message and disable the input
+    inputEl.disabled = true;
+    actionElement.disabled = true;
+    actionElement.textContent = "Submitted";
+    feedbackEl.style.display = "block";
+    
     return;
   }
 
@@ -755,6 +811,13 @@ function renderConsent() {
               <summary><strong>Confidentiality</strong></summary>
               <p class="summary-copy">All responses will be kept confidential and used for research purposes only. No personally identifying information, such as your name, student ID, phone number, or email address, will be linked to your responses.</p>
               <p class="summary-copy">During the study, an anonymous participant ID will be automatically generated. This ID is used only to connect your task responses with your questionnaire responses and does not identify you personally.</p>
+            </details>
+
+            <details class="accordion-item">
+              <summary><strong>Optional Coffee Coupon Raffle</strong></summary>
+              <p class="summary-copy">As a token of appreciation, participants may voluntarily enter a raffle for a mobile coffee coupon after completing the study.</p>
+              <p class="summary-copy">If you would like to participate in the raffle, please submit your email address or, if you are located in Korea, your phone number through the separate form below.</p>
+              <p class="summary-copy">Your information will be collected separately from your research responses and will be used only for raffle administration purposes. It will not be linked to your survey responses or participant ID, and will be deleted after the raffle has been completed.</p>
             </details>
 
             <details class="accordion-item">
@@ -1332,6 +1395,7 @@ function renderComplete() {
           If you wish to withdraw your data after learning about the study\'s full purpose, please contact the researcher <strong>within two weeks</strong> of completing the study and provide <strong>your participant ID</strong>. Your responses will then be removed without any consequences.
         </p>
       </div>
+
       <div class="summary-copy">
         <h3>Contact Information</h3>
         <p>Researcher: Nguyen Phuong Ngoc (지원)</p>
@@ -1350,6 +1414,35 @@ function renderComplete() {
           Start a New Session
         </button>
       </div>
+    </section>
+    <section class="surface complete-card" style="margin-top: 24px;">
+      <!-- NEW COUPON SECTION -->
+      <div class="summary-copy">
+        <h3>Receive Your Coupon</h3>
+        <p style="margin-top: 0; margin-bottom: 16px; font-size: 0.95em; color: #475569;">
+          Please enter your email address or Korean phone number below to receive your participation reward. You can reload to re-enter if you made a mistake.
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <input 
+            id="reward-contact-input" 
+            type="text" 
+            placeholder="Email or Phone Number (e.g., 010-1234-5678)" 
+            style="padding: 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 1rem; width: 100%; box-sizing: border-box;"
+          />
+          <button 
+            class="button secondary" 
+            data-action="submit-reward-info" 
+            type="button"
+            style="align-self: flex-start;"
+          >
+            Submit
+          </button>
+        </div>
+        <p id="reward-feedback-msg" style="margin-top: 12px; margin-bottom: 0; font-size: 0.9em; color: #16a34a; display: none;">
+          ✓ Thank you! Your information has been saved.
+        </p>
+      </div>
+      <!-- END COUPON SECTION -->
     </section>
   `;
 }

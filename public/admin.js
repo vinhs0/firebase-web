@@ -22,6 +22,7 @@ const exportSummaryButton = document.querySelector('#export-summary');
 // Grab the other buttons so we can hide them automatically
 const exportEventsButton = document.querySelector('#export-events');
 const exportJsonButton = document.querySelector('#export-json');
+const downloadRewardsBtn = document.getElementById('download-rewards-btn');
 
 emailField.placeholder = runtimeConfig.adminEmailHint;
 
@@ -39,6 +40,8 @@ signoutButton.addEventListener('click', async () => {
   dashboard.classList.add('hidden');
   authStatus.textContent = 'Logged out.';
 });
+
+if (downloadRewardsBtn) downloadRewardsBtn.addEventListener('click', downloadRewardsCsv);
 
 exportSummaryButton?.addEventListener('click', exportSummary);
 
@@ -198,4 +201,39 @@ function buildSummaryRows() {
 function exportSummary() {
   const csv = toCsv(buildSummaryRows());
   downloadFile('participant-summary.csv', csv, 'text/csv;charset=utf-8');
+}
+
+function downloadRewardsCsv() {
+  // 1. Map through all participants and grab only the rewardContactInfo
+  // Then, filter out anyone who didn't submit an email/phone number
+  const contacts = participants
+    .map(entry => entry.rewardContactInfo)
+    .filter(contact => contact && contact.trim() !== '');
+
+  // // 2. Alert the admin if there is no data yet
+  // if (contacts.length === 0) {
+  //   alert("No reward contact information has been submitted yet.");
+  //   return;
+  // }
+
+  // 3. Build the CSV string (Header row + data rows)
+  // We wrap the contact info in quotes to prevent issues with commas in user input
+  const csvRows = ["Reward Contact Info"]; // Header
+  contacts.forEach(contact => {
+    csvRows.push(`"${contact.replace(/"/g, '""')}"`);
+  });
+  const csvString = csvRows.join('\n');
+
+  // 4. Create the file and trigger the download
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  // Names the file "reward_contacts_YYYY-MM-DD.csv"
+  link.setAttribute('download', `coffee_${new Date().toISOString().split('T')[0]}.csv`);
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
