@@ -484,7 +484,6 @@ if (action === 'submit-reward-info') {
     
     return;
   }
-
   if (action === 'select-option') {
     selectOption(actionElement.dataset.optionId);
     return;
@@ -515,7 +514,30 @@ if (action === 'submit-reward-info') {
     }
     return;
   }
+  if (action === 'verify-survey-code') {
+    const codeInput = document.getElementById('survey-code-input');
+    const errorMsg = document.getElementById('survey-code-error');
+    const successMsg = document.getElementById('survey-code-success');
+    const verifyBtn = document.getElementById('verify-code-btn');
+    const finishBtn = document.getElementById('finish-survey-btn');
+    
+    //code
+    const expectedCode = "4peat4peat"; 
 
+    if (codeInput && codeInput.value.trim() !== expectedCode) {
+      codeInput.style.borderColor = "#ef4444";
+      if (errorMsg) errorMsg.style.display = "block";
+      if (successMsg) successMsg.style.display = "none";
+    } else {
+      codeInput.style.borderColor = "#16a34a";
+      codeInput.disabled = true;
+      verifyBtn.style.display = "none";
+      if (errorMsg) errorMsg.style.display = "none";
+      if (successMsg) successMsg.style.display = "block";
+      if (finishBtn) finishBtn.style.display = "block"; 
+    }
+    return;
+  }
   if (action === 'acknowledge-survey') {
     const now = Date.now();
 
@@ -527,6 +549,7 @@ if (action === 'submit-reward-info') {
     persistState();
     renderStageAndFocus();
     void syncParticipantState();
+    return;
   }
 
   if (action === 'copy-id') {
@@ -725,7 +748,6 @@ function render() {
 
   if (state.currentStage === 'survey') {
     appRoot.insertAdjacentHTML('beforeend', renderSurvey());
-    startSurveyTimer();
 
     const modal = document.getElementById('user-id-modal');
     if (modal && !modal.open) {
@@ -1225,46 +1247,9 @@ function renderQuestion() {
     </section>
   `;
 }
-/**Helper function for renderSurvey()*/
-function startSurveyTimer() {
-  const REQUIRED_WAIT_MS = 60000; // 60 seconds
-  if (surveyTimer) clearInterval(surveyTimer);
-  
-  surveyTimer = setInterval(() => {
-    const btn = document.getElementById('survey-confirm-btn');
-    
-    if (!btn || state.currentStage !== 'survey') {
-      clearInterval(surveyTimer);
-      return;
-    }
-    
-    const elapsed = Date.now() - state.survey.startedAt;
-    const remainingSec = Math.ceil(Math.max(0, REQUIRED_WAIT_MS - elapsed) / 1000);
-    
-    if (remainingSec > 0) {
-      btn.textContent = `Please complete the survey`;
-      btn.disabled = true;
-      btn.removeAttribute('data-action'); // Prevent accidental clicks
-    } else {
-      clearInterval(surveyTimer); // Stop ticking
-      btn.textContent = experimentContent.survey.confirmButton;
-      btn.disabled = false;
-      btn.setAttribute('data-action', 'acknowledge-survey'); // Unlock the button
-    }
-  }, 1000);
-}
 /**Renders the questionnaire page */
 function renderSurvey() {
-  const hasEmbed = Boolean(runtimeConfig.survey.embedUrl);
-  const hasFallback = Boolean(runtimeConfig.survey.fallbackUrl);
-
-  const REQUIRED_WAIT_MS = 60000; // 60 seconds
-  let remainingSec = 0;
-  
-  if (state.survey.startedAt) {
-    const elapsed = Date.now() - state.survey.startedAt;
-    remainingSec = Math.ceil(Math.max(0, REQUIRED_WAIT_MS - elapsed) / 1000);
-  }
+  const hasEmbed = Boolean(runtimeConfig?.survey?.embedUrl);
 
   return `
     <section class="surface survey-card">
@@ -1305,7 +1290,7 @@ function renderSurvey() {
           <button class="button primary" type="submit">I have copied my ID</button>
         </form>
       </dialog>
-
+      
       ${
         hasEmbed
           ? `<iframe class="survey-frame" src="${runtimeConfig.survey.embedUrl}" title="Final survey"></iframe>`
@@ -1316,27 +1301,59 @@ function renderSurvey() {
           `
       }
       
+      <div class="summary-copy" style="background-color: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 24px; margin-bottom: 24px;">
+        <h3 style="margin-top: 0; margin-bottom: 8px;">Completion Code</h3>
+        <p style="margin-top: 0; margin-bottom: 16px; font-size: 0.95em; color: #475569;">
+          Please complete the survey above. At the end of the survey, you will be given a secret completion code. Enter it below to finish the experiment.
+        </p>
+        
+        <div style="display: flex; gap: 12px; align-items: stretch;">
+          <input 
+            id="survey-code-input" 
+            type="text" 
+            placeholder="Enter the code here" 
+            oninput="this.style.borderColor='#cbd5e1'; document.getElementById('survey-code-error').style.display='none';"
+            style="padding: 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 1rem; flex: 1; box-sizing: border-box; outline: none; transition: border-color 0.2s;"
+          />
+          <button 
+            id="verify-code-btn"
+            class="button secondary" 
+            data-action="verify-survey-code" 
+            type="button"
+            style="white-space: nowrap;"
+          >
+            ->
+          </button>
+        </div>
+        <p id="survey-code-error" style="margin-top: 8px; margin-bottom: 0; font-size: 0.9em; color: #ef4444; display: none;">
+          Incorrect code!
+        </p>
+        <p id="survey-code-success" style="margin-top: 8px; margin-bottom: 0; font-size: 0.9em; color: #16a34a; display: none;">
+          ✓
+        </p>
+
+      </div>
       <div class="action-row">
         <button 
-          id="survey-confirm-btn"
+          id="finish-survey-btn"
           class="button primary" 
-          ${remainingSec > 0 ? 'disabled' : 'data-action="acknowledge-survey"'} 
+          data-action="acknowledge-survey" 
           type="button"
+          style="display: none;"
         >
-          ${remainingSec > 0 ? `Please complete the survey` : experimentContent.survey.confirmButton}
+          Finish
         </button>
       </div>
-      
       <div style="margin-top: 12px; padding-bottom: 12px; display: flex; justify-content: flex-start; width: 100%;">
-        <button 
-          class="button ghost" 
-          data-action="stop-experiment" 
-          type="button" 
-          style="color: var(--muted); text-decoration: underline;"
-        >
-          Stop the experiment
-        </button>
-      </div>
+          <button 
+            class="button ghost" 
+            data-action="stop-experiment" 
+            type="button" 
+            style="color: var(--muted); text-decoration: underline;"
+          >
+            Stop the experiment
+          </button>
+        </div>
     </section>
   `;
 }
